@@ -1,0 +1,15 @@
+{
+  "action": "Remove from Offer/Waiting List",
+  "stage": "Submit Changes",
+  "_id": "6683cfd20506022ec7f04f61",
+  "submissionId": "95a76859-971b-4351-9802-57614fffa383",
+  "FirstName": "Oliver",
+  "LastName": "Purchiss",
+  "School": "Palmer Park Preparatory Academy",
+  "SchoolID": 1552,
+  "Grade": "Pre-K",
+  "lotteryList": "Waiting List",
+  "newLotteryList": "Forfeited",
+  "adjustedRank": 34,
+  "notes": "Test label removal"
+}
