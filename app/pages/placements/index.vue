@@ -127,7 +127,7 @@ function getRowItems(row: Row<Result>) {
     {
       label: 'Add to Waiting List',
       icon: 'i-lucide-list-plus',
-      color: 'success',
+      color: 'info',
       onSelect() {
         loadItem({ ...row.original, action: 'Add', stage: actions.buttonText.value })
       }

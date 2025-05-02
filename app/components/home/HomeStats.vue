@@ -1,10 +1,17 @@
 <script setup lang="ts">
+import { subMilliseconds } from 'date-fns';
 import type { Period, Range, Stat } from '~/types'
 
 const props = defineProps<{
   period: Period
   range: Range
 }>()
+
+// Get the submission data from the Pinia
+const submissionStore = useSubmissionStore();
+await useAsyncData("submissions", () => submissionStore.getAll(), {});
+const settingsStore = useSettingsStore()
+await useAsyncData("settings", () => settingsStore.getSettings(), {})
 
 function formatCurrency(value: number): string {
   return value.toLocaleString('en-US', {
@@ -15,13 +22,6 @@ function formatCurrency(value: number): string {
 }
 
 const baseStats = [{
-  title: 'Customers',
-  icon: 'i-lucide-users',
-  minValue: 400,
-  maxValue: 1000,
-  minVariation: -15,
-  maxVariation: 25
-}, {
   title: 'Conversions',
   icon: 'i-lucide-chart-pie',
   minValue: 1000,
@@ -65,30 +65,31 @@ const { data: stats } = await useAsyncData<Stat[]>('stats', async () => {
 
 <template>
   <UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
-    <UPageCard
-      v-for="(stat, index) in stats"
-      :key="index"
-      :icon="stat.icon"
-      :title="stat.title"
-      to="/customers"
-      variant="subtle"
-      :ui="{
+    <UPageCard icon="i-lucide-venetian-mask" title="Applicants" to="/submissions" variant="subtle" :ui="{
+      container: 'gap-y-1.5',
+      leading: 'p-2.5 rounded-full bg-(--ui-primary)/10 ring ring-inset ring-(--ui-primary)/25',
+      title: 'font-normal text-(--ui-text-muted) text-xs uppercase'
+    }"
+      class="lg:rounded-none first:rounded-l-[calc(var(--ui-radius)*2)] last:rounded-r-[calc(var(--ui-radius)*2)] hover:z-1">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl font-semibold text-(--ui-text-highlighted)">
+          {{ submissionStore.submissions.length }}
+        </span>
+      </div>
+    </UPageCard>
+    <UPageCard v-for="(stat, index) in stats" :key="index" :icon="stat.icon" :title="stat.title" to="/customers"
+      variant="subtle" :ui="{
         container: 'gap-y-1.5',
         leading: 'p-2.5 rounded-full bg-(--ui-primary)/10 ring ring-inset ring-(--ui-primary)/25',
         title: 'font-normal text-(--ui-text-muted) text-xs uppercase'
       }"
-      class="lg:rounded-none first:rounded-l-[calc(var(--ui-radius)*2)] last:rounded-r-[calc(var(--ui-radius)*2)] hover:z-1"
-    >
+      class="lg:rounded-none first:rounded-l-[calc(var(--ui-radius)*2)] last:rounded-r-[calc(var(--ui-radius)*2)] hover:z-1">
       <div class="flex items-center gap-2">
         <span class="text-2xl font-semibold text-(--ui-text-highlighted)">
           {{ stat.value }}
         </span>
 
-        <UBadge
-          :color="stat.variation > 0 ? 'success' : 'error'"
-          variant="subtle"
-          class="text-xs"
-        >
+        <UBadge :color="stat.variation > 0 ? 'success' : 'error'" variant="subtle" class="text-xs">
           {{ stat.variation > 0 ? '+' : '' }}{{ stat.variation }}%
         </UBadge>
       </div>

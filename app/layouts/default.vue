@@ -12,6 +12,13 @@ const links = [[{
     open.value = false
   }
 }, {
+  label: 'Submissions',
+  icon: 'i-lucide-venetian-mask',
+  to: '/submissions',
+  onSelect: () => {
+    open.value = false
+  }
+}, {
   label: 'Placements',
   icon: 'i-lucide-file-check',
   to: '/placements',
@@ -25,7 +32,7 @@ const links = [[{
   onSelect: () => {
     open.value = false
   }
-}, {
+}, /*{
   label: 'Inbox',
   icon: 'i-lucide-inbox',
   to: '/inbox',
@@ -71,7 +78,7 @@ const links = [[{
       open.value = false
     }
   }]
-}], [{
+}*/ ], /*[{
   label: 'Feedback',
   icon: 'i-lucide-message-circle',
   to: 'https://github.com/nuxt-ui-pro/dashboard',
@@ -81,13 +88,13 @@ const links = [[{
   icon: 'i-lucide-info',
   to: 'https://github.com/nuxt/ui-pro',
   target: '_blank'
-}]]
+}]*/]
 
 const groups = computed(() => [{
   id: 'links',
   label: 'Go to',
   items: links.flat()
-}, {
+}, /*{
   id: 'code',
   label: 'Code',
   items: [{
@@ -97,7 +104,7 @@ const groups = computed(() => [{
     to: `https://github.com/nuxt-ui-pro/dashboard/blob/main/app/pages${route.path === '/' ? '/index' : route.path}.vue`,
     target: '_blank'
   }]
-}])
+}*/])
 
 /*
 onMounted(async () => {

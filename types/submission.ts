@@ -1,6 +1,6 @@
 export type Submission = {
   _id: string;
-  submissionId: number;
+  submissionId: string;
   submissionStatus: string;
   submitterFirstName: string;
   submitterLastName: string;
