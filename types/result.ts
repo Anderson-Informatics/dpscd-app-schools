@@ -16,6 +16,7 @@ export type Result = {
   TestDate?: string;
   stage?: string;
   action?: string;
+  actionLong?: string;
   notes?: string;
   newList?: string;
   queueStatus?: string;

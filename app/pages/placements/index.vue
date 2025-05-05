@@ -121,7 +121,7 @@ function getRowItems(row: Row<Result>) {
       icon: 'i-lucide-list-minus',
       color: 'error',
       onSelect() {
-        loadItem({ ...row.original, action: 'Remove', stage: actions.buttonText.value })
+        loadItem({ ...row.original, action: 'Remove', actionLong: 'Remove from Offer/Waiting List', stage: actions.buttonText.value })
       }
     },
     {
@@ -129,7 +129,7 @@ function getRowItems(row: Row<Result>) {
       icon: 'i-lucide-list-plus',
       color: 'info',
       onSelect() {
-        loadItem({ ...row.original, action: 'Add', stage: actions.buttonText.value })
+        loadItem({ ...row.original, action: 'Add', actionLong: 'Add to Waiting List', stage: actions.buttonText.value })
       }
     },
     {
@@ -137,7 +137,7 @@ function getRowItems(row: Row<Result>) {
       icon: 'i-lucide-list-end',
       color: 'warning',
       onSelect() {
-        loadItem({ ...row.original, action: 'Secondary', stage: actions.buttonText.value })
+        loadItem({ ...row.original, action: 'Secondary', actionLong: 'Move to Secondary Waitlist', stage: actions.buttonText.value })
       }
     },
     {
@@ -145,7 +145,7 @@ function getRowItems(row: Row<Result>) {
       icon: 'i-lucide-folder-check',
       color: 'primary',
       onSelect() {
-        loadItem({ ...row.original, action: 'Enroll', stage: actions.buttonText.value })
+        loadItem({ ...row.original, action: 'Enroll', actionLong: 'Confirm Enrollment Status', stage: actions.buttonText.value })
       }
     },
     /*
@@ -270,6 +270,25 @@ const columns: TableColumn<Result>[] = [
     }
   },
   {
+    accessorKey: 'ChoiceRank',
+    header: ({ column }) => {
+      const isSorted = column.getIsSorted()
+
+      return h(UButton, {
+        color: 'neutral',
+        variant: 'ghost',
+        label: 'Choice',
+        icon: isSorted
+          ? isSorted === 'asc'
+            ? 'i-lucide-arrow-up-narrow-wide'
+            : 'i-lucide-arrow-down-wide-narrow'
+          : 'i-lucide-arrow-up-down',
+        class: '-mx-2.5',
+        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+      })
+    }
+  },
+  {
     accessorKey: 'lotteryList',
     header: 'List',
     cell: ({ cell }) => {
@@ -301,7 +320,7 @@ const columns: TableColumn<Result>[] = [
       return h(UButton, {
         color: 'neutral',
         variant: 'ghost',
-        label: 'Rank',
+        label: 'List Position',
         icon: isSorted
           ? isSorted === 'asc'
             ? 'i-lucide-arrow-up-narrow-wide'
@@ -389,10 +408,11 @@ const loadItem = (val: Result) => {
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
-
+        <!--
         <template #right>
           <CustomersAddModal />
         </template>
+        -->
       </UDashboardNavbar>
     </template>
 
@@ -405,9 +425,10 @@ const loadItem = (val: Result) => {
           -->
 
           <template #body>
-            {{ formValues }}
             <UForm :schema="schema" :state="state">
-              {{ formValues.action }} for {{ formValues.FirstName }} {{ formValues.LastName }}
+              Perform the "{{ formValues.actionLong }}" action for {{ formValues.FirstName }} {{ formValues.LastName }}
+              at {{
+                formValues.School }} for the {{ formValues.Grade }} grade.<br /><br />
               <UFormField label="Notes" name="notes">
                 <UTextarea v-model="formValues.notes" placeholder="Add your notes/reasoning for changes..."
                   class="w-full" />
