@@ -32,6 +32,13 @@ const links = [[{
   onSelect: () => {
     open.value = false
   }
+}, {
+  label: 'School Capacity',
+  icon: 'i-lucide-school',
+  to: '/capacity',
+  onSelect: () => {
+    open.value = false
+  }
 }, /*{
   label: 'Inbox',
   icon: 'i-lucide-inbox',

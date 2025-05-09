@@ -10,7 +10,7 @@ const _useDashboard = () => {
     "g-s": () => router.push("/submissions"),
     "g-p": () => router.push("/placements"),
     "g-q": () => router.push("/queue"),
-    //"g-c": () => router.push("/settings"),
+    "g-c": () => router.push("/capacity"),
     n: () =>
       (isNotificationsSlideoverOpen.value =
         !isNotificationsSlideoverOpen.value),
