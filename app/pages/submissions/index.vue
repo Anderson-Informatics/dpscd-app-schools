@@ -47,6 +47,13 @@ function getRowItems(row: Row<Submission>) {
       label: 'Actions'
     },
     {
+      label: 'View applicant/submission details',
+      icon: 'i-lucide-list',
+      onSelect() {
+        navigateTo('submissions/' + row.original.submissionId)
+      }
+    },
+    {
       label: 'Copy ID',
       icon: 'i-lucide-copy',
       onSelect() {
@@ -58,11 +65,16 @@ function getRowItems(row: Row<Submission>) {
       }
     },
     {
-      type: 'separator'
-    },
-    {
-      label: 'View customer details',
-      icon: 'i-lucide-list'
+      label: 'View on Submittable',
+      icon: 'i-lucide-external-link',
+      onSelect() {
+        navigateTo('https://dpscd.submittable.com/submissions/' + row.original.submissionId, {
+          external: true,
+          open: {
+            target: '_blank'
+          }
+        })
+      }
     },
     /*
     {

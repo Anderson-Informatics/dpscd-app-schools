@@ -12,6 +12,7 @@ export default function () {
   const pendingChanges = ref<string[]>([]);
   const pendingStatus = ref<boolean>(false);
   const buttonText = ref<string>("Check");
+  const buttonDisabled = ref<boolean>(false);
   const pendingIds = ref<string[]>([]);
 
   // temp add user data for testing until the Auth is back running
@@ -182,6 +183,8 @@ export default function () {
       pendingIds.value.push(payload._id);
     }
     if (payload.stage === "Submit Changes") {
+      // Disable the button to prevent double clicking
+      buttonDisabled.value = true;
       // add the pending changes to the history log
       const changeObj: Change = {
         changes: pendingChanges.value,
@@ -295,6 +298,8 @@ export default function () {
     }
     // Once changes have been similated/pending, actually make the changes
     if (payload.stage === "Submit Changes") {
+      // Disable the button to prevent double clicking
+      buttonDisabled.value = true;
       // add the pending changes to the history log
       const changeObj: Change = {
         changes: pendingChanges.value,
@@ -396,6 +401,8 @@ export default function () {
     });
     // Once changes have been similated/pending, actually make the changes
     if (payload.stage === "Submit Changes") {
+      // Disable the button to prevent double clicking
+      buttonDisabled.value = true;
       console.log("Running accept offer submit function");
       // add the pending changes to the history log
       const changeObj: Change = {
@@ -417,17 +424,19 @@ export default function () {
       const pendingOffer = resultStore.pendingOffers.find(
         (item: Result) => item._id === payload._id
       );
-      if (!pendingOffer) {
-        throw new Error(`Pending offer with id ${payload._id} not found`);
-      }
+
       acceptObj.lotteryList = "Offered List";
       acceptObj.adjustedRank = maxRank + 1;
       acceptObj.queueStatus = undefined;
-      pendingOffer.lotteryList = "Offered List";
-      pendingOffer.adjustedRank = maxRank + 1;
-      pendingOffer.queueStatus = undefined;
       resultStore.results = [...resultStore.results];
-      resultStore.pendingOffers = [...resultStore.pendingOffers];
+      if (!pendingOffer) {
+        console.log(`Pending offer with id ${payload._id} not found`);
+      } else if (pendingOffer) {
+        pendingOffer.lotteryList = "Offered List";
+        pendingOffer.adjustedRank = maxRank + 1;
+        pendingOffer.queueStatus = undefined;
+        resultStore.pendingOffers = [...resultStore.pendingOffers];
+      }
       // Add the Accept - School label
       addLabel(payload, "Accept");
       // Remove the Waitlist - School label
@@ -455,8 +464,10 @@ export default function () {
   const runAction = (payload: Result) => {
     if (payload.action === "Remove") {
       moveToList(payload, "Forfeited");
-    } else if (payload.action === "Add") {
+    } else if (payload.action === "Add Wait") {
       moveToList(payload, "Waiting List");
+    } else if (payload.action === "Add Offer") {
+      runAcceptOffer(payload);
     } else if (payload.action === "Secondary") {
       moveToList(payload, "Secondary Waitlist");
     } else if (payload.action === "Enroll") {
@@ -484,6 +495,7 @@ export default function () {
     // takes the "action" string to trigger the proper functions
     runAction,
     buttonText,
+    buttonDisabled,
     pendingChanges,
     pendingIds,
     pendingStatus,

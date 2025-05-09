@@ -6,6 +6,7 @@ import type { User } from '~/types'
 import type { Result } from '~~/types/result'
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
+import { roundToNearestHours } from 'date-fns'
 
 const schema = z.object({
   notes: z.string(),
@@ -30,6 +31,7 @@ const table = useTemplateRef('table')
 // Get the results and schools data from the Pinia store
 const resultStore = useResultStore()
 await useAsyncData("results", () => resultStore.getAll(), {})
+await useAsyncData("pendingOffers", () => resultStore.getPending(), {});
 await useAsyncData("schools", () => resultStore.getSchools(), {})
 const changeStore = useChangeStore()
 await useAsyncData("changes", () => changeStore.getAll(), {})
@@ -92,6 +94,13 @@ function getRowItems(row: Row<Result>) {
       label: 'Actions'
     },
     {
+      label: 'View applicant/submission details',
+      icon: 'i-lucide-list',
+      onSelect() {
+        navigateTo('submissions/' + row.original.submissionId)
+      }
+    },
+    {
       label: 'Copy ID',
       icon: 'i-lucide-copy',
       onSelect() {
@@ -103,18 +112,19 @@ function getRowItems(row: Row<Result>) {
       }
     },
     {
-      type: 'separator'
-    },
-    {
-      label: 'View customer details',
-      icon: 'i-lucide-list'
-    },
-    {
-      label: 'Run Test Action',
-      icon: 'i-lucide-fast-forward',
+      label: 'View on Submittable',
+      icon: 'i-lucide-external-link',
       onSelect() {
-        loadItem({ ...row.original, action: 'Test Action', stage: actions.buttonText.value })
+        navigateTo('https://dpscd.submittable.com/submissions/' + row.original.submissionId, {
+          external: true,
+          open: {
+            target: '_blank'
+          }
+        })
       }
+    },
+    {
+      type: 'separator'
     },
     {
       label: 'Remove from Offer/Waiting List',
@@ -129,7 +139,7 @@ function getRowItems(row: Row<Result>) {
       icon: 'i-lucide-list-plus',
       color: 'info',
       onSelect() {
-        loadItem({ ...row.original, action: 'Add', actionLong: 'Add to Waiting List', stage: actions.buttonText.value })
+        loadItem({ ...row.original, action: 'Add Wait', actionLong: 'Add to Waiting List', stage: actions.buttonText.value })
       }
     },
     {
@@ -138,6 +148,14 @@ function getRowItems(row: Row<Result>) {
       color: 'warning',
       onSelect() {
         loadItem({ ...row.original, action: 'Secondary', actionLong: 'Move to Secondary Waitlist', stage: actions.buttonText.value })
+      }
+    },
+    {
+      label: 'Add to Offered List',
+      icon: 'i-lucide-list-plus',
+      color: 'success',
+      onSelect() {
+        loadItem({ ...row.original, action: 'Add Offer', actionLong: 'Add to Offered List', stage: actions.buttonText.value })
       }
     },
     {
@@ -397,6 +415,7 @@ const loadItem = (val: Result) => {
   actions.pendingChanges.value = []
   actions.pendingStatus.value = false
   actions.buttonText.value = "Check"
+  actions.buttonDisabled.value = false
   actions.pendingIds.value = []
 }
 </script>
@@ -447,7 +466,7 @@ const loadItem = (val: Result) => {
           <template #footer>
             <UButton label="Cancel" color="neutral" variant="outline"
               @click="actions.showModal.value = false; actions.buttonText.value = 'Check'" />
-            <UButton :label="actions.buttonText.value" color="neutral"
+            <UButton :label="actions.buttonText.value" :disabled="actions.buttonDisabled.value" color="neutral"
               @click="actions.runAction({ ...formValues, stage: actions.buttonText.value })" />
           </template>
         </UModal>

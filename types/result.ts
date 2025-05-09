@@ -13,7 +13,8 @@ export type Result = {
   submissionDate: string;
   lotteryList: string;
   adjustedRank?: number | null;
-  TestDate?: string;
+  TestDate?: Date;
+  comment?: string;
   stage?: string;
   action?: string;
   actionLong?: string;
