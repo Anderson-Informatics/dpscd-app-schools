@@ -20,15 +20,32 @@ export type Result = {
   actionLong?: string;
   notes?: string;
   newList?: string;
-  queueStatus?: string;
+  queueStatus?: string | null;
   queueDate?: Date;
   confirmedEnrollment?: boolean;
   update?: {
-    queueStatus?: string;
-    queueDate?: Date;
+    queueStatus?: string | null;
+    queueDate?: Date | null;
     lotteryList?: string;
     adjustedRank?: number | null;
     confirmedEnrollment?: boolean;
   };
   type?: string;
+  contact?: {
+    submissionId?: string;
+    ParentFirst?: string;
+    ParentLast?: string;
+    ParentPhone?: string;
+    ParentEmail?: string;
+  };
+  results?: [
+    {
+      _id?: string;
+      submissionId?: string;
+      School?: string;
+      ChoiceRank?: number;
+      adjustedRank?: number;
+      lotteryList?: string;
+    }
+  ];
 };

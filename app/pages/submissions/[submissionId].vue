@@ -62,47 +62,56 @@ data.value = data.value.map((qualification) => {
 </script>
 
 <template>
-  <div class="m-10 w-full">
-    Submission Page {{ $route.params.submissionId }} <br />
-    <h1 class="font-bold text-2xl">
-      {{ submissionStore.submission.FullName }}
-    </h1>
-    <p>Grade: {{ submissionStore.submission.Grade }}</p>
-    <p>DOB: {{ submissionStore.submission.DOB }}</p>
-    <hr class="bg-gray-400 my-2 h-[2px] w-full" />
-    <h2 class="font-bold text-xl mt-4">School Rankings</h2>
+  <UDashboardPanel :id="$route.params.submissionId">
+    <template #header>
+      <UDashboardNavbar :title="submissionStore.submission.FullName">
+        <template #leading>
+          <UDashboardSidebarCollapse />
+        </template>
+      </UDashboardNavbar>
+    </template>
 
-    <p>
-      <span class="text-sm text-slate-500">First-Choice:</span>
-      {{ submissionStore.submission.FirstChoiceSchool }}
-    </p>
-    <p>
-      <span class="text-sm text-slate-500">Second-Choice:</span>
-      {{ submissionStore.submission.SecondChoiceSchool }}
-    </p>
-    <p>
-      <span class="text-sm text-slate-500">Third-Choice:</span>
-      {{ submissionStore.submission.ThirdChoiceSchool }}
-    </p>
-    <hr class="bg-gray-400 my-2 h-[2px] w-full" />
-    <h2 class="font-bold text-xl mt-4">Qualification and Eligibility</h2>
-    <UTabs :items="data" orientation="horizontal" :ui="{ wrapper: 'flex items-center gap-4', list: { width: 'w-48' } }">
-      <template #content="{ item }">
+    <template #body>
+      <div class="">
+        <p>Grade: {{ submissionStore.submission.Grade }}</p>
+        <p>DOB: {{ submissionStore.submission.DOB }}</p>
+        <hr class="bg-gray-400 my-2 h-[2px] w-full" />
+        <h2 class="font-bold text-xl mt-4">School Rankings</h2>
 
-        <div class="flex flex-col gap-2">
-          <h3 class="text-lg font-bold">{{ item.School }}</h3>
-          <p class="text-sm text-slate-500">Selection Rank: {{ item.ChoiceRank }}</p>
-          <p class="text-sm text-slate-500">Status: {{ item.EligibilityStatus }}</p>
-          <p class="text-sm text-slate-500">Age Eligible: {{ item.AgeEligible }}</p>
-          <div v-if="[1084, 2882, 689, 7326].includes(item.SchoolID)" class="flex flex-col gap-2">
-            <p class="text-sm text-slate-500">Exam Score: {{ item.ExamScore }}</p>
-            <p class="text-sm text-slate-500">Exam Type: {{ item.ExamScoreType }}</p>
-            <p class="text-sm text-slate-500">Qualifying Score: {{ item.QualifyingScore }}</p>
-          </div>
-        </div>
-      </template>
-    </UTabs>
+        <p>
+          <span class="text-sm text-slate-500">First-Choice:</span>
+          {{ submissionStore.submission.FirstChoiceSchool }}
+        </p>
+        <p>
+          <span class="text-sm text-slate-500">Second-Choice:</span>
+          {{ submissionStore.submission.SecondChoiceSchool }}
+        </p>
+        <p>
+          <span class="text-sm text-slate-500">Third-Choice:</span>
+          {{ submissionStore.submission.ThirdChoiceSchool }}
+        </p>
+        <hr class="bg-gray-400 my-2 h-[2px] w-full" />
+        <h2 class="font-bold text-xl mt-4">Qualification and Eligibility</h2>
+        <UTabs :items="data" orientation="horizontal"
+          :ui="{ wrapper: 'flex items-center gap-4', list: { width: 'w-48' } }">
+          <template #content="{ item }">
 
-  </div>
+            <div class="flex flex-col gap-2">
+              <h3 class="text-lg font-bold">{{ item.School }}</h3>
+              <p class="text-sm text-slate-500">Selection Rank: {{ item.ChoiceRank }}</p>
+              <p class="text-sm text-slate-500">Status: {{ item.EligibilityStatus }}</p>
+              <p class="text-sm text-slate-500">Age Eligible: {{ item.AgeEligible }}</p>
+              <div v-if="[1084, 2882, 689, 7326].includes(item.SchoolID)" class="flex flex-col gap-2">
+                <p class="text-sm text-slate-500">Exam Score: {{ item.ExamScore }}</p>
+                <p class="text-sm text-slate-500">Exam Type: {{ item.ExamScoreType }}</p>
+                <p class="text-sm text-slate-500">Qualifying Score: {{ item.QualifyingScore }}</p>
+              </div>
+            </div>
+          </template>
+        </UTabs>
+
+      </div>
+    </template>
+  </UDashboardPanel>
 
 </template>

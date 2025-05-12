@@ -87,11 +87,19 @@ const { data, status } = await useFetch<User[]>('/api/customers', {
   lazy: true
 })
 
+// This is the drop down menu for the row actions
 function getRowItems(row: Row<Result>) {
   return [
     {
       type: 'label',
       label: 'Actions'
+    },
+    {
+      label: 'View applicant/submission details',
+      icon: 'i-lucide-list',
+      onSelect() {
+        navigateTo('submissions/' + row.original.submissionId)
+      }
     },
     {
       label: 'Copy ID',
@@ -105,33 +113,34 @@ function getRowItems(row: Row<Result>) {
       }
     },
     {
+      label: 'View on Submittable',
+      icon: 'i-lucide-external-link',
+      onSelect() {
+        navigateTo('https://dpscd.submittable.com/submissions/' + row.original.submissionId, {
+          external: true,
+          open: {
+            target: '_blank'
+          }
+        })
+      }
+    },
+    {
       type: 'separator'
     },
     {
-      label: 'View customer details',
-      icon: 'i-lucide-list'
-    },
-    {
-      label: 'Run Test Action',
-      icon: 'i-lucide-fast-forward',
-      onSelect() {
-        loadItem({ ...row.original, action: 'Test Action', stage: actions.buttonText.value })
-      }
-    },
-    {
-      label: 'Remove from Offer/Waiting List',
-      icon: 'i-lucide-list-minus',
-      color: 'error',
-      onSelect() {
-        loadItem({ ...row.original, action: 'Remove', stage: actions.buttonText.value })
-      }
-    },
-    {
-      label: 'Add to Waiting List',
-      icon: 'i-lucide-list-plus',
+      label: 'Accept Offer',
+      icon: 'i-lucide-list-check',
       color: 'success',
       onSelect() {
-        loadItem({ ...row.original, action: 'Add', stage: actions.buttonText.value })
+        loadItem({ ...row.original, action: 'Accept', actionLong: 'Add to Offered List', stage: actions.buttonText.value })
+      }
+    },
+    {
+      label: 'Decline Offer',
+      icon: 'i-lucide-list-x',
+      color: 'error',
+      onSelect() {
+        loadItem({ ...row.original, action: 'Decline', actionLong: 'Decline Offer from Waitlist', stage: actions.buttonText.value })
       }
     },
     {
@@ -139,15 +148,7 @@ function getRowItems(row: Row<Result>) {
       icon: 'i-lucide-list-end',
       color: 'warning',
       onSelect() {
-        loadItem({ ...row.original, action: 'Secondary', stage: actions.buttonText.value })
-      }
-    },
-    {
-      label: 'Confirm Enrollment Status',
-      icon: 'i-lucide-folder-check',
-      color: 'primary',
-      onSelect() {
-        loadItem({ ...row.original, action: 'Enroll', stage: actions.buttonText.value })
+        loadItem({ ...row.original, action: 'Secondary', actionLong: 'Move to Secondary Waitlist', stage: actions.buttonText.value })
       }
     },
     /*
@@ -171,21 +172,21 @@ function getRowItems(row: Row<Result>) {
 
 const columns: TableColumn<Result>[] = [
   {
-    id: 'select',
-    header: ({ table }) =>
-      h(UCheckbox, {
-        'modelValue': table.getIsSomePageRowsSelected()
-          ? 'indeterminate'
-          : table.getIsAllPageRowsSelected(),
-        'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
-          table.toggleAllPageRowsSelected(!!value),
-        'ariaLabel': 'Select all'
-      }),
+    id: 'expand',
     cell: ({ row }) =>
-      h(UCheckbox, {
-        'modelValue': row.getIsSelected(),
-        'onUpdate:modelValue': (value: boolean | 'indeterminate') => row.toggleSelected(!!value),
-        'ariaLabel': 'Select row'
+      h(UButton, {
+        color: 'neutral',
+        variant: 'ghost',
+        icon: 'i-lucide-chevron-down',
+        square: true,
+        'aria-label': 'Expand',
+        ui: {
+          leadingIcon: [
+            'transition-transform',
+            row.getIsExpanded() ? 'duration-200 rotate-180' : ''
+          ]
+        },
+        onClick: () => row.toggleExpanded()
       })
   },
   {
@@ -357,6 +358,9 @@ const columns: TableColumn<Result>[] = [
   }
 ]
 
+// This is the default expanded state for the table
+const expanded = ref({ 1: true })
+
 const sorting = ref([
   {
     id: 'LastName',
@@ -383,7 +387,7 @@ const formValues = ref<Result>({
   LastName: '',
   ChoiceRank: 0,
   submissionDate: '',
-  lotteryList: ''
+  lotteryList: '',
 })
 
 // This will reset the edit modal component
@@ -406,10 +410,6 @@ const loadItem = (val: Result) => {
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
-
-        <template #right>
-          <CustomersAddModal />
-        </template>
       </UDashboardNavbar>
     </template>
 
@@ -422,7 +422,6 @@ const loadItem = (val: Result) => {
           -->
 
           <template #body>
-            {{ formValues }}
             <UForm :schema="schema" :state="state">
               {{ formValues.action }} for {{ formValues.FirstName }} {{ formValues.LastName }}
               <UFormField label="Notes" name="notes">
@@ -526,7 +525,7 @@ const loadItem = (val: Result) => {
         </div>
       </div>
 
-      <UTable ref="table" v-model:sorting="sorting" v-model:global-filter="globalFilter"
+      <UTable ref="table" v-model:expanded="expanded" v-model:sorting="sorting" v-model:global-filter="globalFilter"
         v-model:column-visibility="columnVisibility" v-model:row-selection="rowSelection"
         v-model:pagination="pagination" :pagination-options="{
           getPaginationRowModel: getPaginationRowModel()
@@ -536,7 +535,42 @@ const loadItem = (val: Result) => {
           tbody: '[&>tr]:last:[&>td]:border-b-0',
           th: 'py-1 first:rounded-l-[calc(var(--ui-radius)*2)] last:rounded-r-[calc(var(--ui-radius)*2)] border-y border-(--ui-border) first:border-l last:border-r',
           td: 'border-b border-(--ui-border)'
-        }" />
+        }">
+        <template #expanded="{ row }" class="flex">
+          <UCard variant="outline" class="mb-4">
+            <template #header>
+              Parent Contact Details for {{ row.original.FirstName }} {{ row.original.LastName }}
+            </template>
+
+            <div v-if="row.original.contact">
+              {{ row.original.contact.ParentFirst }}
+              {{ row.original.contact.ParentLast }}<br />
+              {{ row.original.contact.ParentPhone }}<br />
+              {{ row.original.contact.ParentEmail }}
+            </div>
+            <div v-else>
+              Reload the page to fetch the contact details.
+            </div>
+          </UCard>
+          <UCard variant="outline" class="mb-4">
+            <template #header>
+              Placement Details for {{ row.original.FirstName }} {{ row.original.LastName }}
+            </template>
+
+            <div v-if="row.original.results">
+              <div v-for="(result, index) in row.original.results" :key="index" class="mb-4">
+                <strong v-if="result.School">{{ result.School }}</strong><br />
+                Choice: &nbsp;{{ result.ChoiceRank }}<br />
+                {{ result.lotteryList }}
+                <span v-if="result.adjustedRank"> Position {{ result.adjustedRank }}</span>
+              </div>
+            </div>
+            <div v-else>
+              Reload the page to fetch the contact details.
+            </div>
+          </UCard>
+        </template>
+      </UTable>
 
       <div class="flex items-center justify-between gap-3 border-t border-(--ui-border) pt-4 mt-auto">
         <div class="text-sm text-(--ui-text-muted)">

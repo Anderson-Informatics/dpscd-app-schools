@@ -256,7 +256,7 @@ export default function () {
       offer.queueDate = new Date();
       // Add this to deal with shallowRef limitation of TanStack table
       resultStore.results = [...resultStore.results];
-      // Update the result in the store
+      // Update the result in the database using the Pinia store action updateResult
       resultStore.updateResult({
         ...offer,
         update: {
@@ -264,6 +264,11 @@ export default function () {
           queueDate: new Date(),
         },
       });
+      // Also handle the change to the pending offer store add the offer to the pendingOffers
+      resultStore.pendingOffers.push(offer); // This just gives the basic row data without the detailed info
+      // This was added to fix the shallowRef limitation of TanStack table data reactivity
+      resultStore.pendingOffers = [...resultStore.pendingOffers];
+
       toast.add({
         title: "Successfully Made Offer",
         description: `Added ${offer.FirstName} ${offer.LastName} at ${offer.School}, grade ${offer.Grade} to 'Offer Pending' list`,
@@ -334,6 +339,11 @@ export default function () {
         return;
       }
       updateObj.lotteryList = list;
+      updateObj.queueStatus = null;
+
+      const pendingOffer = resultStore.pendingOffers.find(
+        (item: Result) => item._id === payload._id
+      );
 
       if (list === "Forfeited") {
         updateObj.adjustedRank = null;
@@ -343,8 +353,17 @@ export default function () {
           update: {
             lotteryList: list,
             adjustedRank: null,
+            queueStatus: null,
           },
         });
+        if (!pendingOffer) {
+          console.log(`Pending offer with id ${payload._id} not found`);
+        } else if (pendingOffer) {
+          pendingOffer.lotteryList = list;
+          pendingOffer.adjustedRank = null;
+          pendingOffer.queueStatus = null;
+          resultStore.pendingOffers = [...resultStore.pendingOffers];
+        }
       } else {
         updateObj.adjustedRank = maxRank + 1;
         // Send the decline information to update
@@ -353,8 +372,17 @@ export default function () {
           update: {
             lotteryList: list,
             adjustedRank: maxRank + 1,
+            queueStatus: null,
           },
         });
+        if (!pendingOffer) {
+          console.log(`Pending offer with id ${payload._id} not found`);
+        } else if (pendingOffer) {
+          pendingOffer.lotteryList = list;
+          pendingOffer.adjustedRank = maxRank + 1;
+          pendingOffer.queueStatus = null;
+          resultStore.pendingOffers = [...resultStore.pendingOffers];
+        }
       }
       // This was added to fix the shallowRef limitation of TanStack table data reactivity
       resultStore.results = [...resultStore.results];
@@ -427,14 +455,14 @@ export default function () {
 
       acceptObj.lotteryList = "Offered List";
       acceptObj.adjustedRank = maxRank + 1;
-      acceptObj.queueStatus = undefined;
+      acceptObj.queueStatus = null;
       resultStore.results = [...resultStore.results];
       if (!pendingOffer) {
         console.log(`Pending offer with id ${payload._id} not found`);
       } else if (pendingOffer) {
         pendingOffer.lotteryList = "Offered List";
         pendingOffer.adjustedRank = maxRank + 1;
-        pendingOffer.queueStatus = undefined;
+        pendingOffer.queueStatus = null;
         resultStore.pendingOffers = [...resultStore.pendingOffers];
       }
       // Add the Accept - School label
@@ -447,7 +475,7 @@ export default function () {
         update: {
           lotteryList: "Offered List",
           adjustedRank: maxRank + 1,
-          queueStatus: undefined,
+          queueStatus: null,
         },
       });
       toast.add({
@@ -462,6 +490,7 @@ export default function () {
   };
 
   const runAction = (payload: Result) => {
+    console.log("event: ", event);
     if (payload.action === "Remove") {
       moveToList(payload, "Forfeited");
     } else if (payload.action === "Add Wait") {
@@ -474,6 +503,8 @@ export default function () {
       confirmEnrollment(payload);
     } else if (payload.action === "Accept") {
       runAcceptOffer(payload);
+    } else if (payload.action === "Decline") {
+      moveToList(payload, "Forfeited");
     } else if (payload.action === "Test Action") {
       console.log("Test Action: ", payload);
       buttonText.value = "Checking...";
