@@ -33,23 +33,28 @@ export default defineEventHandler(async (event) => {
     };
     // These are the stage UUIDs that are unique to the Project and will need to be updated every year
     // UPDATE ANNUALLY
-    const stagePK1: Record<number, string> = {
-      689: "5a39d74d-4e89-482f-9e08-7c192f0f8a65", // Accept - Chrysler
-      1084: "386a187c-4999-4285-b911-c47db1e57ca7", // Accept - Edison
-      1552: "0755b60a-f309-4d82-8e73-9d01ba52e568", // Accept - Palmer
-      2882: "0bd3a9b9-81b0-4c54-ac0a-322100ae11ed", // Accept - Bates
-      3638: "798d05b1-b046-4ba1-bede-b4ecf833cc4d", // Accept - TSM
-      3639: "f9922d33-0de3-4f9b-a282-0f60f30487bc", // Accept - Edmonson
-      7326: "49e1071c-9655-426e-9eed-7823e1b06ce7", // Accept - FLICS
+    const stagePK: Record<number, string> = {
+      1084: "f6a0db0a-9b42-47c3-b71c-621de6fbede5", // Accept - Edison x
+      1552: "9bf8e42a-9787-492d-8c72-281ee9480c63", // Accept - Palmer x
+      3639: "275e4386-24ee-4261-92e2-9e5cb686426b", // Accept - Edmonson x
+    };
+    const stageK1: Record<number, string> = {
+      689: "eabba42c-3b38-4e7f-ac5e-f288b1403a08", // Accept - Chrysler x
+      1084: "d96dcb11-1aca-4d14-8f16-6a15bb68d3bb", // Accept - Edison x
+      1552: "153bead0-8271-41ce-908d-b78ac6905a30", // Accept - Palmer x
+      2882: "b9755ab9-8bd7-40c2-b4c3-96bf64582261", // Accept - Bates x
+      3638: "d0b4e411-aced-4aa6-b82d-1c5bca685b8c", // Accept - TSM x
+      3639: "26c00808-22c9-4568-befb-8417d8b1929a", // Accept - Edmonson x
+      7326: "2ac5959f-e806-460f-922a-835c9b0726dc", // Accept - FLICS x
     };
     const stage28: Record<number, string> = {
-      689: "8b747e87-baa4-43bd-baa2-e7955ab4094c", // Accept - Chrysler
-      1084: "44aa4c5d-c256-4eab-98ce-6f45fce4d37e", // Accept - Edison
-      1552: "b1d1a9f5-270c-4655-a987-2a9e65268683", // Accept - Palmer
-      2882: "e9aa6041-b84b-4156-9ad5-e94bab3ef079", // Accept - Bates
-      3638: "c3f02873-98dc-45c3-88e6-431d2d4cc27f", // Accept - TSM
-      3639: "d5a66b4a-1d29-4ec5-b87c-78fd35cf81a1", // Accept - Edmonson
-      7326: "ea372269-422a-4b0f-a280-4694c7bfc836", // Accept - FLICS
+      689: "00c5654e-0c02-4870-935e-65c6a912c304", // Accept - Chrysler x
+      1084: "b76a8c46-4596-4a13-b21a-376f8cdc4779", // Accept - Edison x
+      1552: "52658e77-7b6c-4a74-b828-918e9be337c1", // Accept - Palmer x
+      2882: "aac80917-64f8-4e77-aefa-1bbd947b6f5d", // Accept - Bates x
+      3638: "b5df003c-accc-48ce-8b26-b469714d2cfc", // Accept - TSM x
+      3639: "8ef3e389-0a20-4b1a-bd09-4421fbe79cad", // Accept - Edmonson x
+      7326: "c3f547cc-68c9-474d-8470-8bc0df2178f0", // Accept - FLICS x
     };
 
     const setLabelId = (
@@ -85,12 +90,15 @@ export default defineEventHandler(async (event) => {
     if (body.type == "Accept") {
       const setStageId = (
         body: Result,
-        stagePK1: Record<number, string>,
+        stagePK: Record<number, string>,
+        stageK1: Record<number, string>,
         stage28: Record<number, string>
       ) => {
         // Assign the appropriate stageId based on the School and grade level
-        if (["Pre-K", "Kindergarten", "1"].includes(body.Grade)) {
-          return stagePK1[body.SchoolID];
+        if (["Pre-K"].includes(body.Grade)) {
+          return stagePK[body.SchoolID];
+        } else if (["Kindergarten", "1"].includes(body.Grade)) {
+          return stageK1[body.SchoolID];
         } else if (["2", "3", "4", "5", "6", "7", "8"].includes(body.Grade)) {
           return stage28[body.SchoolID];
         } else {
@@ -98,7 +106,7 @@ export default defineEventHandler(async (event) => {
         }
       };
 
-      const stageId = setStageId(body, stagePK1, stage28);
+      const stageId = setStageId(body, stagePK, stageK1, stage28);
 
       if (stageId !== "") {
         const responseStage = await $fetch(

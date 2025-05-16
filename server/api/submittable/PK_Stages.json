@@ -1,0 +1,149 @@
+[
+    {
+        "reviewStageId": "828ed604-16e4-4b39-bd69-834367f19e6e",
+        "stageName": "New Application",
+        "stageOrder": 0,
+        "type": "no_review",
+        "reviewerUserIds": []
+    },
+    {
+        "reviewStageId": "2b88289b-68a0-4afc-a369-beb1fefc0585",
+        "stageName": "Age Eligibility Check",
+        "stageOrder": 1,
+        "type": "no_review",
+        "reviewerUserIds": []
+    },
+    {
+        "reviewStageId": "d378409d-bf74-4c7e-a943-68e100a833e7",
+        "stageName": "Montessori/TSM Initial Review",
+        "stageOrder": 2,
+        "type": "custom_review",
+        "formId": "1eadd418-c741-4b9f-b00b-478ee8e764d4",
+        "reviewerUserIds": [
+            "ad0dc720-c781-42bc-9d1c-22afed45752d"
+        ],
+        "hasCompletedReviews": true
+    },
+    {
+        "reviewStageId": "f326991f-b939-4746-acf1-379d5012a8cf",
+        "stageName": "Montessori/TSM Final Review",
+        "stageOrder": 3,
+        "type": "custom_review",
+        "formId": "1eadd418-c741-4b9f-b00b-478ee8e764d4",
+        "reviewerUserIds": [
+            "5f3d4c7b-db4b-423f-8069-3cef9b8e0428"
+        ]
+    },
+    {
+        "reviewStageId": "bb81fb1f-b1a2-474b-acfa-c8c48401379c",
+        "stageName": "IEP Completion Review",
+        "stageOrder": 4,
+        "type": "custom_review",
+        "formId": "d2434efd-6d80-44a5-85b9-896f62a0e4ec",
+        "reviewerUserIds": [
+            "ad0dc720-c781-42bc-9d1c-22afed45752d"
+        ],
+        "hasCompletedReviews": true
+    },
+    {
+        "reviewStageId": "b3cd0d52-4323-4301-bc7d-6735d1e6e318",
+        "stageName": "IEP Review ",
+        "stageOrder": 5,
+        "type": "custom_review",
+        "formId": "c789590e-9588-4a52-be77-9a4096da3b25",
+        "reviewerUserIds": [
+            "79d1970c-12ce-45da-b3a6-90eee0366d4b",
+            "143283ab-97e6-4c7d-b37a-83dd092f9080",
+            "78368f31-9004-4644-8921-79a2d98fc27a",
+            "be740ac2-3b5b-4ccf-94e9-836f5fb6e7a9"
+        ],
+        "hasCompletedReviews": true
+    },
+    {
+        "reviewStageId": "4b2c5717-3718-42fa-aa4e-3c2322439d13",
+        "stageName": "504 Review",
+        "stageOrder": 6,
+        "type": "custom_review",
+        "formId": "a5fc43cd-1a12-4d7b-ab4a-c4b25d12bea3",
+        "reviewerUserIds": [
+            "ff16bc30-212b-4993-b37d-4590c75f357d"
+        ]
+    },
+    {
+        "reviewStageId": "7a149cfd-3eb0-4c29-bee1-d5cb91eebd95",
+        "stageName": "Ready for Placement",
+        "stageOrder": 7,
+        "type": "no_review",
+        "reviewerUserIds": []
+    },
+    {
+        "reviewStageId": "f6a0db0a-9b42-47c3-b71c-621de6fbede5",
+        "stageName": "Edison Accepted",
+        "stageOrder": 8,
+        "type": "custom_review",
+        "formId": "60a18e3c-d15d-4d8f-aa6c-05eca8ea90d5",
+        "reviewerUserIds": [
+            "5177ace6-0f52-461f-9d95-12a4f92cc73c",
+            "67f1b1fc-555e-4e43-b05c-5f661bfed4ca"
+        ]
+    },
+    {
+        "reviewStageId": "275e4386-24ee-4261-92e2-9e5cb686426b",
+        "stageName": "Edmonson Accepted",
+        "stageOrder": 9,
+        "type": "custom_review",
+        "formId": "60a18e3c-d15d-4d8f-aa6c-05eca8ea90d5",
+        "reviewerUserIds": [
+            "2c6e9cdb-6e70-4966-ba67-3c33601c7358",
+            "3164e7ff-966f-4b78-b9c1-24ace3895972",
+            "52132d36-d14b-42aa-a9c8-8079fd8971c7"
+        ]
+    },
+    {
+        "reviewStageId": "9bf8e42a-9787-492d-8c72-281ee9480c63",
+        "stageName": "Palmer Park Accepted",
+        "stageOrder": 10,
+        "type": "custom_review",
+        "formId": "60a18e3c-d15d-4d8f-aa6c-05eca8ea90d5",
+        "reviewerUserIds": [
+            "269ef578-f0b4-4a3d-9a69-d61d4a2dc35d",
+            "3ba21375-7a2a-4bd4-a118-76618f91debc",
+            "a140b697-7eef-4934-bc91-5d0315684b7b"
+        ]
+    },
+    {
+        "reviewStageId": "ad68f342-754f-4226-be6f-58c58e532763",
+        "stageName": "Primary Waitlist",
+        "stageOrder": 11,
+        "type": "no_review",
+        "reviewerUserIds": []
+    },
+    {
+        "reviewStageId": "ec6c4c0c-8406-4ef9-b58e-3bbadf49a4f9",
+        "stageName": "Secondary Waitlist",
+        "stageOrder": 12,
+        "type": "no_review",
+        "reviewerUserIds": []
+    },
+    {
+        "reviewStageId": "f090641c-0578-460a-916b-8ee067da1c4c",
+        "stageName": "Declined",
+        "stageOrder": 13,
+        "type": "no_review",
+        "reviewerUserIds": []
+    },
+    {
+        "reviewStageId": "7adcd9ef-30fd-4903-bf30-f7f2822eeccf",
+        "stageName": "Withdrawn Application",
+        "stageOrder": 14,
+        "type": "no_review",
+        "reviewerUserIds": []
+    },
+    {
+        "reviewStageId": "e00ff0d6-a0a5-4825-9204-68b7a4dc4327",
+        "stageName": "Ineligible",
+        "stageOrder": 15,
+        "type": "no_review",
+        "reviewerUserIds": []
+    }
+]

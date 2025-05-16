@@ -1,0 +1,266 @@
+[
+    {
+        "reviewStageId": "991a86b9-eb9c-41c4-966a-f694eb077c93",
+        "stageName": "New Application",
+        "stageOrder": 0,
+        "type": "no_review",
+        "reviewerUserIds": []
+    },
+    {
+        "reviewStageId": "14ae12bf-bfbe-475a-acc2-3f42492ea84c",
+        "stageName": "IEP Completion Review",
+        "stageOrder": 1,
+        "type": "custom_review",
+        "formId": "d2434efd-6d80-44a5-85b9-896f62a0e4ec",
+        "reviewerUserIds": [
+            "ad0dc720-c781-42bc-9d1c-22afed45752d"
+        ],
+        "hasCompletedReviews": true
+    },
+    {
+        "reviewStageId": "84068589-8c64-412f-93b7-bc9763cc4005",
+        "stageName": "Hold for Exam",
+        "stageOrder": 2,
+        "type": "no_review",
+        "reviewerUserIds": []
+    },
+    {
+        "reviewStageId": "969959b4-9844-4522-bce0-058b4a7fb2d3",
+        "stageName": "Exam IEP Review",
+        "stageOrder": 3,
+        "type": "custom_review",
+        "formId": "cddee877-24a8-4e4a-adef-282f76b0b98d",
+        "reviewerUserIds": [
+            "79d1970c-12ce-45da-b3a6-90eee0366d4b",
+            "143283ab-97e6-4c7d-b37a-83dd092f9080",
+            "78368f31-9004-4644-8921-79a2d98fc27a",
+            "be740ac2-3b5b-4ccf-94e9-836f5fb6e7a9"
+        ],
+        "hasCompletedReviews": true
+    },
+    {
+        "reviewStageId": "1bb2aed4-cb8f-4609-8fb8-e86a9f36b1ed",
+        "stageName": "Non-Exam IEP Review",
+        "stageOrder": 4,
+        "type": "custom_review",
+        "formId": "c789590e-9588-4a52-be77-9a4096da3b25",
+        "reviewerUserIds": [
+            "79d1970c-12ce-45da-b3a6-90eee0366d4b",
+            "143283ab-97e6-4c7d-b37a-83dd092f9080",
+            "78368f31-9004-4644-8921-79a2d98fc27a",
+            "be740ac2-3b5b-4ccf-94e9-836f5fb6e7a9"
+        ],
+        "hasCompletedReviews": true
+    },
+    {
+        "reviewStageId": "bbd3b14e-9b9d-4cbc-978a-6a3fec9c5f87",
+        "stageName": "504 Review",
+        "stageOrder": 5,
+        "type": "custom_review",
+        "formId": "a5fc43cd-1a12-4d7b-ab4a-c4b25d12bea3",
+        "reviewerUserIds": [
+            "ff16bc30-212b-4993-b37d-4590c75f357d"
+        ],
+        "hasCompletedReviews": true
+    },
+    {
+        "reviewStageId": "f80460e6-649b-4e9c-a91c-6e2a838786a2",
+        "stageName": "Montessori/Marygrove Review",
+        "stageOrder": 6,
+        "type": "custom_review",
+        "formId": "1eadd418-c741-4b9f-b00b-478ee8e764d4",
+        "reviewerUserIds": [
+            "ad0dc720-c781-42bc-9d1c-22afed45752d"
+        ],
+        "hasCompletedReviews": true
+    },
+    {
+        "reviewStageId": "52ff0d2c-8b4e-48d5-9991-053643a7e298",
+        "stageName": "Age Eligibility",
+        "stageOrder": 7,
+        "type": "custom_review",
+        "formId": "c567e991-9e94-403f-99fe-83d1b6002fb9",
+        "reviewerUserIds": [
+            "ad0dc720-c781-42bc-9d1c-22afed45752d"
+        ]
+    },
+    {
+        "reviewStageId": "8766e5cc-b55c-4741-802f-13d403f24cd1",
+        "stageName": "Montessori Final Review",
+        "stageOrder": 8,
+        "type": "custom_review",
+        "formId": "1eadd418-c741-4b9f-b00b-478ee8e764d4",
+        "reviewerUserIds": [
+            "5f3d4c7b-db4b-423f-8069-3cef9b8e0428"
+        ],
+        "hasCompletedReviews": true
+    },
+    {
+        "reviewStageId": "ce89fb9a-59d8-480f-a0c6-5b0ab91f3dda",
+        "stageName": "Ready for Placement Decision",
+        "stageOrder": 9,
+        "type": "no_review",
+        "reviewerUserIds": []
+    },
+    {
+        "reviewStageId": "62c7b11a-c93b-444e-95fa-e914520cf7d5",
+        "stageName": "2-8 Appeal Review",
+        "stageOrder": 10,
+        "type": "custom_review",
+        "formId": "550571c8-920b-4128-9a49-8bd3ba76cd90",
+        "reviewerUserIds": []
+    },
+    {
+        "reviewStageId": "03b727aa-a009-4f48-a4b9-880653cb4acd",
+        "stageName": "Waitlist",
+        "stageOrder": 11,
+        "type": "no_review",
+        "reviewerUserIds": []
+    },
+    {
+        "reviewStageId": "8cc0d5be-89a7-4d91-a1d4-a4ed49491abe",
+        "stageName": "Secondary Waitlist",
+        "stageOrder": 12,
+        "type": "no_review",
+        "reviewerUserIds": []
+    },
+    {
+        "reviewStageId": "286a13fe-3c54-4fff-83f7-7e9617d79802",
+        "stageName": "Hold for Future Lottery",
+        "stageOrder": 13,
+        "type": "no_review",
+        "reviewerUserIds": []
+    },
+    {
+        "reviewStageId": "aac80917-64f8-4e77-aefa-1bbd947b6f5d",
+        "stageName": "Bates Accepted",
+        "stageOrder": 14,
+        "type": "custom_review",
+        "formId": "60a18e3c-d15d-4d8f-aa6c-05eca8ea90d5",
+        "reviewerUserIds": [
+            "18f2c6e8-f5cb-4ff9-8408-e20c54b1ad11",
+            "87992b3d-4e3f-451a-8c97-23d98b404f54",
+            "fd7967bd-be9c-4e5c-9d69-5eef4172d145"
+        ]
+    },
+    {
+        "reviewStageId": "00c5654e-0c02-4870-935e-65c6a912c304",
+        "stageName": "Chrysler Accepted",
+        "stageOrder": 15,
+        "type": "custom_review",
+        "formId": "60a18e3c-d15d-4d8f-aa6c-05eca8ea90d5",
+        "reviewerUserIds": [
+            "dceb99a5-8bd1-4aaf-a10f-c235df70d676",
+            "12104a66-f6c2-4a64-8447-55d3e56ccc81"
+        ]
+    },
+    {
+        "reviewStageId": "c3f547cc-68c9-474d-8470-8bc0df2178f0",
+        "stageName": "FLICS Accepted",
+        "stageOrder": 16,
+        "type": "custom_review",
+        "formId": "60a18e3c-d15d-4d8f-aa6c-05eca8ea90d5",
+        "reviewerUserIds": [
+            "8c2d4b11-7afc-43e6-b19a-11ded6ebd21b",
+            "ac0176ec-df4b-44fc-9949-7ac145a5c416",
+            "cdc5daa4-1624-4ebd-ac93-56fd50ca74b4"
+        ]
+    },
+    {
+        "reviewStageId": "b76a8c46-4596-4a13-b21a-376f8cdc4779",
+        "stageName": "Edison Accepted",
+        "stageOrder": 17,
+        "type": "custom_review",
+        "formId": "60a18e3c-d15d-4d8f-aa6c-05eca8ea90d5",
+        "reviewerUserIds": [
+            "5177ace6-0f52-461f-9d95-12a4f92cc73c",
+            "67f1b1fc-555e-4e43-b05c-5f661bfed4ca"
+        ]
+    },
+    {
+        "reviewStageId": "8ef3e389-0a20-4b1a-bd09-4421fbe79cad",
+        "stageName": "Edmonson Accepted",
+        "stageOrder": 18,
+        "type": "custom_review",
+        "formId": "60a18e3c-d15d-4d8f-aa6c-05eca8ea90d5",
+        "reviewerUserIds": [
+            "2c6e9cdb-6e70-4966-ba67-3c33601c7358",
+            "3164e7ff-966f-4b78-b9c1-24ace3895972",
+            "52132d36-d14b-42aa-a9c8-8079fd8971c7"
+        ]
+    },
+    {
+        "reviewStageId": "52658e77-7b6c-4a74-b828-918e9be337c1",
+        "stageName": "Palmer Park Accepted",
+        "stageOrder": 19,
+        "type": "custom_review",
+        "formId": "60a18e3c-d15d-4d8f-aa6c-05eca8ea90d5",
+        "reviewerUserIds": [
+            "91993b83-3f23-416a-aa7a-33b58ca30337",
+            "a140b697-7eef-4934-bc91-5d0315684b7b",
+            "3ba21375-7a2a-4bd4-a118-76618f91debc",
+            "269ef578-f0b4-4a3d-9a69-d61d4a2dc35d",
+            "4e4bdd34-3ef1-4907-977e-6f888a0c85f0"
+        ]
+    },
+    {
+        "reviewStageId": "b5df003c-accc-48ce-8b26-b469714d2cfc",
+        "stageName": "TSM Accepted",
+        "stageOrder": 20,
+        "type": "custom_review",
+        "formId": "60a18e3c-d15d-4d8f-aa6c-05eca8ea90d5",
+        "reviewerUserIds": [
+            "b8d1d10b-8903-451b-a307-9a0d92293452",
+            "3f7b52b3-6d23-4131-af71-9ba93e16e5d9",
+            "9fd3004b-c92c-4aa5-92e3-e3747ef047d9"
+        ]
+    },
+    {
+        "reviewStageId": "004848e5-c155-449b-8ed0-2197895752fa",
+        "stageName": "Declined",
+        "stageOrder": 21,
+        "type": "no_review",
+        "reviewerUserIds": []
+    },
+    {
+        "reviewStageId": "c73b8589-5c73-4bb8-a088-cfef73836cc6",
+        "stageName": "NO EXAM",
+        "stageOrder": 22,
+        "type": "yes_no_maybe",
+        "reviewerUserIds": []
+    },
+    {
+        "reviewStageId": "04bea44b-c31a-40fb-b5bb-808d47f84f75",
+        "stageName": "Ineligible",
+        "stageOrder": 23,
+        "type": "no_review",
+        "reviewerUserIds": []
+    },
+    {
+        "reviewStageId": "30c97cfd-c6b0-41f0-863f-0a5ec70ef551",
+        "stageName": "Withdrawn Application",
+        "stageOrder": 24,
+        "type": "no_review",
+        "reviewerUserIds": []
+    },
+    {
+        "reviewStageId": "c3a12341-a0e0-40da-af95-b219ba87e005",
+        "stageName": "Edison Principal Review",
+        "stageOrder": 25,
+        "type": "custom_review",
+        "formId": "a6877a05-2554-4f42-89b6-8bc587083b25",
+        "reviewerUserIds": [
+            "5177ace6-0f52-461f-9d95-12a4f92cc73c"
+        ]
+    },
+    {
+        "reviewStageId": "dcf78ee8-f8e7-445f-a642-7d7f0887e01b",
+        "stageName": "Montessori Appeal Review",
+        "stageOrder": 26,
+        "type": "yes_no_maybe",
+        "reviewerUserIds": [
+            "6cb75910-e695-449b-b03a-e4c1655dfa38",
+            "36c1f559-e901-446b-90b4-cb90aa4a2425"
+        ]
+    }
+]

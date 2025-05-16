@@ -477,6 +477,7 @@ const loadItem = (val: Result) => {
         -->
         <UInput v-model="globalFilter" class="max-w-sm" placeholder="Filter..." />
 
+
         <div class="flex flex-wrap items-center gap-1.5">
           <CustomersDeleteModal :count="table?.tableApi?.getFilteredSelectedRowModel().rows.length">
             <UButton v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Delete" color="error"
@@ -522,6 +523,14 @@ const loadItem = (val: Result) => {
             { label: '8', value: '8' }
           ]" :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
             placeholder="Filter status" class="min-w-28" />
+          <UButton type="button" @click="console.log(schoolFilter, listFilter, gradeFilter)" icon="i-lucide-folder-down"
+            class="bg-primary-500 hover:bg-primary-600 text-white font-bold">
+            <DownloadExcel :data="table?.tableApi?.getFilteredRowModel().rows.map((row) => row.original)" type="xlsx"
+              worksheet="Placements"
+              :name="`Placements_${schoolFilter.replaceAll(' ', '')}_${listFilter.replaceAll(' ', '')}_${gradeFilter}.xlsx`">
+              Export
+            </DownloadExcel>
+          </UButton>
           <UDropdownMenu :items="table?.tableApi
             ?.getAllColumns()
             .filter((column) => column.getCanHide())
