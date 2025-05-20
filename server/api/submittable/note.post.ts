@@ -26,12 +26,12 @@ export default defineEventHandler(async (event) => {
       // Construct a custom message for submittable
       let customMessage = "";
       if (changes.length === 1) {
-        if (body.changes[0] === changes?.change) {
+        if (body.changes[0] === changes[0].change) {
           // Don't duplicte the triggering action if it the the same
-          customMessage = `${body.userName} from management app:<br/>Note: ${body.notes}<br/>Movement: ${changes?.change}`;
+          customMessage = `${body.userName} from management app:<br/>Note: ${body.notes}<br/>Movement: ${changes[0].change}`;
         } else {
           // If the change is not the same, add the triggering action
-          customMessage = `${body.userName} from management app:<br/>Trigger Action: ${changes?.change}<br/>Note: ${body.notes}<br/>Movement: ${changes?.change}`;
+          customMessage = `${body.userName} from management app:<br/>Trigger Action: ${changes[0].change}<br/>Note: ${body.notes}<br/>Movement: ${changes[0].change}`;
         }
       } else if (changes.length > 1) {
         let changeText = "";
