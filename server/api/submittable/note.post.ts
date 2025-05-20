@@ -1,3 +1,4 @@
+import { textChangeRangeNewSpan } from "typescript";
 import type { Result } from "~~/types/result";
 export default defineEventHandler(async (event) => {
   // Get data from body
@@ -11,19 +12,39 @@ export default defineEventHandler(async (event) => {
 
   // Update a result
   try {
-    for (const change of changeLog) {
+    const uniqueSubmissionIds = new Set();
+    // Extract unique submission IDs from the change log
+    for (let i = 0; i < changeLog.length; i++) {
+      uniqueSubmissionIds.add(changeLog[i].submissionId);
+    }
+
+    for (const id of uniqueSubmissionIds) {
+      const changes = changeLog.filter(
+        (change: { submissionId: string; change: string }) =>
+          change.submissionId === id
+      );
+      console.log("Changes", changes.length);
       // Get the result from the database
       // Construct a custom message for submittable
       let customMessage = "";
-      if (body.changes[0] === change.change) {
-        // Don't duplicte the triggering action if it the the same
-        customMessage = `${body.userName} from management app:<br/>Note: ${body.notes}<br/>Change: ${change.change}`;
-      } else {
-        // If the change is not the same, add the triggering action
-        customMessage = `${body.userName} from management app:<br/>Trigger Action: ${change.change}<br/>Note: ${body.notes}<br/>Change: ${change.change}`;
+      if (changes.length === 1) {
+        if (body.changes[0] === changes?.change) {
+          // Don't duplicte the triggering action if it the the same
+          customMessage = `${body.userName} from management app:<br/>Note: ${body.notes}<br/>Movement: ${changes?.change}`;
+        } else {
+          // If the change is not the same, add the triggering action
+          customMessage = `${body.userName} from management app:<br/>Trigger Action: ${changes?.change}<br/>Note: ${body.notes}<br/>Movement: ${changes?.change}`;
+        }
+      } else if (changes.length > 1) {
+        let changeText = "";
+        for (const each of changes) {
+          changeText += `${each.change}<br/>`;
+        }
+        customMessage = `${body.userName} from management app:<br/>Note: ${body.notes}<br/>Movement: ${changeText}`;
       }
+
       await $fetch(
-        `https://submittable-api.submittable.com/v4/submissions/${change.submissionId}/notes`,
+        `https://submittable-api.submittable.com/v4/submissions/${id}/notes`,
         {
           method: "POST",
           headers: {
