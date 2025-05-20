@@ -341,7 +341,7 @@ export default function () {
       }
       // If the original status being decline is from the offered list, remove the Accept - School label
       if (payload.lotteryList === "Offered List" && list === "Forfeited") {
-        //deleteLabel(payload, "Accept");
+        deleteLabel(payload, "Accept");
       } else if (
         payload.lotteryList === "Waiting List" &&
         list === "Forfeited"
