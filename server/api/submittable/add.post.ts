@@ -87,7 +87,19 @@ export default defineEventHandler(async (event) => {
       }
     );
 
+
     if (body.type == "Accept") {
+      // Add the updated placement label to any that get a new accept placement
+      await $fetch(
+        `https://submittable-api.submittable.com/v4/submissions/${body.submissionId}/labels/f03b84d4-f15e-4beb-aab7-32a6684a45ed`,
+        {
+          method: "PUT",
+          headers: {
+            Accept: "application/json",
+            Authorization: `Basic ${SUBMITTABLE_API_KEY}`,
+          },
+        }
+      );
       const setStageId = (
         body: Result,
         stagePK: Record<number, string>,
