@@ -1,5 +1,3 @@
-import { textChangeRangeNewSpan } from "typescript";
-import type { Result } from "~~/types/result";
 export default defineEventHandler(async (event) => {
   // Get data from body
   const body = await readBody(event);

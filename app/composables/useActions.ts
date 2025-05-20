@@ -18,6 +18,7 @@ export default function () {
   const pendingLog = ref<
     Array<{ submissionId: string; change: string } | null>
   >([]);
+  const changeLogged = ref<boolean>(false);
 
   const addLabel = (payload: Result, type: string) => {
     settingsStore.settings.applyLabels
@@ -291,7 +292,7 @@ export default function () {
     //adjustRankings(offer);
   };
 
-  const moveToList = (payload: Result, list: string) => {
+  const moveToList = (payload: Result, list: string, changeLogged: boolean) => {
     console.log("Move to List Payload (composable function): ", payload);
     // Calculate the proper adjustedRank based on the new list
     const maxRank = getMaxRank(payload, resultStore.results, list);
@@ -334,7 +335,10 @@ export default function () {
         date: new Date(),
         log: pendingLog.value,
       };
-      changeStore.addChange(changeObj);
+      // Only run if the change has not already been logged
+      if (!changeLogged) {
+        changeStore.addChange(changeObj);
+      }
       // If the original status being decline is from the offered list, remove the Accept - School label
       if (payload.lotteryList === "Offered List" && list === "Forfeited") {
         //deleteLabel(payload, "Accept");
@@ -449,8 +453,10 @@ export default function () {
         stage: payload.stage,
         action: "Decline lower ranked choices",
       };
-      moveToList(temp, "Forfeited");
+      moveToList(temp, "Forfeited", changeLogged.value);
     });
+    // After the initial test calculations, mark the change as logged so only it only logs once
+    changeLogged.value = true;
     // Once changes have been similated/pending, actually make the changes
     if (payload.stage === "Submit Changes") {
       // Disable the button to prevent double clicking
@@ -518,19 +524,19 @@ export default function () {
   const runAction = (payload: Result) => {
     console.log("event: ", event);
     if (payload.action === "Remove") {
-      moveToList(payload, "Forfeited");
+      moveToList(payload, "Forfeited", false);
     } else if (payload.action === "Add Wait") {
-      moveToList(payload, "Waiting List");
+      moveToList(payload, "Waiting List", false);
     } else if (payload.action === "Add Offer") {
       runAcceptOffer(payload);
     } else if (payload.action === "Secondary") {
-      moveToList(payload, "Secondary Waitlist");
+      moveToList(payload, "Secondary Waitlist", false);
     } else if (payload.action === "Enroll") {
       confirmEnrollment(payload);
     } else if (payload.action === "Accept") {
       runAcceptOffer(payload);
     } else if (payload.action === "Decline") {
-      moveToList(payload, "Forfeited");
+      moveToList(payload, "Forfeited", false);
     } else if (payload.action === "Test Action") {
       console.log("Test Action: ", payload);
       console.log("userStore user: ", userStore.value.user);
