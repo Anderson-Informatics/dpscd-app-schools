@@ -2,11 +2,9 @@ import type { Result } from "~~/types/result";
 export default defineEventHandler(async (event) => {
   // Get data from body
   const body = await readBody(event);
-  console.log("Body: ", body);
 
   // The submissionId based major change log
   const changeLog = body.log;
-  console.log("Change log: ", changeLog);
 
   // Get the runtimeconfig SUBMITTABLE API KEY
   const SUBMITTABLE_API_KEY = useRuntimeConfig().SUBMITTABLE_API_KEY;
@@ -24,7 +22,7 @@ export default defineEventHandler(async (event) => {
         // If the change is not the same, add the triggering action
         customMessage = `${body.userName} from management app:<br/>Trigger Action: ${change.change}<br/>Note: ${body.notes}<br/>Change: ${change.change}`;
       }
-      const response = await $fetch(
+      await $fetch(
         `https://submittable-api.submittable.com/v4/submissions/${change.submissionId}/notes`,
         {
           method: "POST",
@@ -38,7 +36,6 @@ export default defineEventHandler(async (event) => {
           },
         }
       );
-      console.log("Submittable response: ", response);
     }
     return { message: "New notes logged in Submittable" };
   } catch (e: any) {
