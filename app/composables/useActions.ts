@@ -7,6 +7,7 @@ export default function () {
   const resultStore = useResultStore();
   const changeStore = useChangeStore();
   const settingsStore = useSettingsStore();
+  const userStore = useAppUser();
 
   const showModal = ref<boolean>(false);
   const pendingChanges = ref<string[]>([]);
@@ -14,12 +15,9 @@ export default function () {
   const buttonText = ref<string>("Check");
   const buttonDisabled = ref<boolean>(false);
   const pendingIds = ref<string[]>([]);
-
-  // temp add user data for testing until the Auth is back running
-  const user = ref({
-    id: "67e55ae65f571e0e0d1e2bbc",
-    email: "eric.anderson@detroitk12.org",
-  });
+  const pendingLog = ref<
+    Array<{ submissionId: string; change: string } | null>
+  >([]);
 
   const addLabel = (payload: Result, type: string) => {
     settingsStore.settings.applyLabels
@@ -42,6 +40,10 @@ export default function () {
           `Change ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade} from '${payload.lotteryList}' to 'Waiting List'`
         );
         pendingIds.value.push(payload._id);
+        pendingLog.value.push({
+          submissionId: payload.submissionId,
+          change: `Change ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade} from '${payload.lotteryList}' to 'Waiting List'`,
+        });
       }
       // Once changes have been similated/pending, actually make the changes
       if (payload.stage === "Submit Changes") {
@@ -55,10 +57,12 @@ export default function () {
         const changeObj: Change = {
           changes: pendingChanges.value,
           ids: pendingIds.value,
-          userId: user.value?.id ?? "",
-          userEmail: user.value?.email ?? "",
+          userId: userStore.value?.user.localAccountId ?? "",
+          userEmail: userStore.value?.user.username ?? "",
+          userName: userStore.value?.user.name ?? "",
           notes: payload.notes ?? "",
           date: new Date(),
+          log: pendingLog.value,
         };
         changeStore.addChange(changeObj);
         // Update the Pinia store for the result being changed to "Decline"
@@ -181,6 +185,10 @@ export default function () {
         `Confirm Enrollment for ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade}`
       );
       pendingIds.value.push(payload._id);
+      pendingLog.value.push({
+        submissionId: payload.submissionId,
+        change: `Confirm Enrollment for ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade}`,
+      });
     }
     if (payload.stage === "Submit Changes") {
       // Disable the button to prevent double clicking
@@ -189,10 +197,12 @@ export default function () {
       const changeObj: Change = {
         changes: pendingChanges.value,
         ids: pendingIds.value,
-        userId: user.value?.id ?? "",
-        userEmail: user.value?.email ?? "",
+        userId: userStore.value?.user.localAccountId ?? "",
+        userEmail: userStore.value?.user.username ?? "",
+        userName: userStore.value?.user.name ?? "",
         notes: payload.notes ?? "",
         date: new Date(),
+        log: pendingLog.value,
       };
       changeStore.addChange(changeObj);
       // Update the Pinia store for the result being changed to "Decline"
@@ -249,6 +259,10 @@ export default function () {
         `Add ${offer.FirstName} ${offer.LastName} at ${offer.School}, grade ${offer.Grade} to 'Offer Pending' list`
       );
       pendingIds.value.push(offer._id);
+      pendingLog.value.push({
+        submissionId: payload.submissionId,
+        change: `Add ${offer.FirstName} ${offer.LastName} at ${offer.School}, grade ${offer.Grade} to 'Offer Pending' list`,
+      });
     }
     if (payload.stage === "Submit Changes") {
       // This updates the pinia state directly WOW!
@@ -287,9 +301,13 @@ export default function () {
       pendingStatus.value = true;
       buttonText.value = "Submit Changes";
       pendingChanges.value.push(
-        `Change ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade} from '${payload.lotteryList}' to '${list}''`
+        `Change ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade} from '${payload.lotteryList}' to '${list}'`
       );
       pendingIds.value.push(payload._id);
+      pendingLog.value.push({
+        submissionId: payload.submissionId,
+        change: `Change ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade} from '${payload.lotteryList}' to '${list}'`,
+      });
     }
     console.log("Pending Changes: ", pendingChanges.value);
     // Will run everytime to simulate the changes and/or make the changes
@@ -309,10 +327,12 @@ export default function () {
       const changeObj: Change = {
         changes: pendingChanges.value,
         ids: pendingIds.value,
-        userId: user.value?.id ?? "",
-        userEmail: user.value?.email ?? "",
+        userId: userStore.value?.user.localAccountId ?? "",
+        userEmail: userStore.value?.user.username ?? "",
+        userName: userStore.value?.user.name ?? "",
         notes: payload.notes ?? "",
         date: new Date(),
+        log: pendingLog.value,
       };
       changeStore.addChange(changeObj);
       // If the original status being decline is from the offered list, remove the Accept - School label
@@ -407,6 +427,10 @@ export default function () {
         `Change ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade} from '${payload.lotteryList}' to 'Offered List'`
       );
       pendingIds.value.push(payload._id);
+      pendingLog.value.push({
+        submissionId: payload.submissionId,
+        change: `Change ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade} from '${payload.lotteryList}' to 'Offered List'`,
+      });
     }
     // Will run everytime to simulate the changes and/or make the changes
     adjustRankings(payload);
@@ -436,10 +460,12 @@ export default function () {
       const changeObj: Change = {
         changes: pendingChanges.value,
         ids: pendingIds.value,
-        userId: user.value?.id ?? "",
-        userEmail: user.value?.email ?? "",
+        userId: userStore.value?.user.localAccountId ?? "",
+        userEmail: userStore.value?.user.username ?? "",
+        userName: userStore.value?.user.name ?? "",
         notes: payload.notes ?? "",
         date: new Date(),
+        log: pendingLog.value,
       };
       changeStore.addChange(changeObj);
       // Update the Pinia store for the result being changed to "Offered List"
@@ -507,6 +533,7 @@ export default function () {
       moveToList(payload, "Forfeited");
     } else if (payload.action === "Test Action") {
       console.log("Test Action: ", payload);
+      console.log("userStore user: ", userStore.value.user);
       buttonText.value = "Checking...";
       toast.add({
         title: "Test Action from Composable",
@@ -529,6 +556,7 @@ export default function () {
     buttonDisabled,
     pendingChanges,
     pendingIds,
+    pendingLog,
     pendingStatus,
     showModal,
   };

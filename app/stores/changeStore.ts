@@ -24,8 +24,12 @@ export const useChangeStore = defineStore("change-store", {
           method: "POST",
           body: body,
         });
-        console.log(response);
-        return response;
+        let resp2 = await $fetch("/api/submittable/note", {
+          method: "POST",
+          body: body,
+        });
+        console.log(response, resp2);
+        return [response, resp2];
       } catch (e: any) {
         console.log(e.message);
       }

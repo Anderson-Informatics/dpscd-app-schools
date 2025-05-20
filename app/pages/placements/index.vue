@@ -127,6 +127,14 @@ function getRowItems(row: Row<Result>) {
       type: 'separator'
     },
     {
+      label: 'Run Test Action',
+      icon: 'i-lucide-play',
+      color: 'default',
+      onSelect() {
+        loadItem({ ...row.original, action: 'Test Action', actionLong: 'Run Test Action', stage: actions.buttonText.value })
+      }
+    },
+    {
       label: 'Remove from Offer/Waiting List',
       icon: 'i-lucide-list-minus',
       color: 'error',
@@ -417,6 +425,7 @@ const loadItem = (val: Result) => {
   actions.buttonText.value = "Check"
   actions.buttonDisabled.value = false
   actions.pendingIds.value = []
+  actions.pendingLog.value = []
 }
 </script>
 

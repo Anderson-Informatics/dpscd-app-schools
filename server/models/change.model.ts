@@ -8,6 +8,12 @@ const schema: mongoose.Schema = new mongoose.Schema({
   userEmail: String,
   notes: String,
   date: Date,
+  log: [
+    {
+      submissionId: String,
+      change: String,
+    },
+  ],
 });
 
 // history model
