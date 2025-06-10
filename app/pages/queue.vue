@@ -194,6 +194,34 @@ const columns: TableColumn<Result>[] = [
     header: 'ID',
   },
   {
+    accessorKey: 'queueDate',
+    header: ({ column }) => {
+      const isSorted = column.getIsSorted()
+
+      return h(UButton, {
+        color: 'neutral',
+        variant: 'ghost',
+        label: 'Date Added',
+        icon: isSorted
+          ? isSorted === 'asc'
+            ? 'i-lucide-arrow-up-narrow-wide'
+            : 'i-lucide-arrow-down-wide-narrow'
+          : 'i-lucide-arrow-up-down',
+        class: '-mx-2.5',
+        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+      })
+    },
+    cell: ({ row }) => {
+      return new Date(row.getValue('queueDate')).toLocaleString('en-US', {
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      })
+    },
+  },
+  {
     accessorKey: 'FirstName',
     header: ({ column }) => {
       const isSorted = column.getIsSorted()
@@ -361,9 +389,10 @@ const columns: TableColumn<Result>[] = [
 // This is the default expanded state for the table
 const expanded = ref({ 1: true })
 
+// This is the default sorting for the table
 const sorting = ref([
   {
-    id: 'LastName',
+    id: 'queueDate',
     desc: false
   }
 ])
