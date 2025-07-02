@@ -43,6 +43,7 @@ const rowSelection = ref({})
 const schoolFilter = ref('all')
 const listFilter = ref('all')
 const gradeFilter = ref('all')
+const enrollFilter = ref<string | boolean | null>('all')
 
 watch(() => schoolFilter.value, (newVal) => {
   if (!table?.value?.tableApi) return
@@ -80,6 +81,19 @@ watch(() => gradeFilter.value, (newVal) => {
     gradeColumn.setFilterValue(undefined)
   } else {
     gradeColumn.setFilterValue(newVal)
+  }
+})
+
+watch(() => enrollFilter.value, (newVal) => {
+  if (!table?.value?.tableApi) return
+
+  const enrollColumn = table.value.tableApi.getColumn('confirmedEnrollment')
+  if (!enrollColumn) return
+
+  if (newVal === 'all') {
+    enrollColumn.setFilterValue(undefined)
+  } else {
+    enrollColumn.setFilterValue(newVal)
   }
 })
 
@@ -557,6 +571,13 @@ const loadItem = (val: Result) => {
             { label: '6', value: '6' },
             { label: '7', value: '7' },
             { label: '8', value: '8' }
+          ]" :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
+            placeholder="Filter status" class="min-w-28" />
+          <USelect v-model="enrollFilter" :items="[
+            { label: 'All Enrollment', value: 'all' },
+            { label: 'Enrolled', value: true },
+            { label: 'Not Enrolled', value: false },
+            { label: 'Unknown', value: null }
           ]" :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
             placeholder="Filter status" class="min-w-28" />
           <UButton type="button" @click="console.log(schoolFilter, listFilter, gradeFilter)" icon="i-lucide-folder-down"
