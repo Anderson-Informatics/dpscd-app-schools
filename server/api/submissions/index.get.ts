@@ -51,7 +51,18 @@ export default defineEventHandler(async (event: H3Event) => {
     } else if (decline) {
       return { ...decline, status: "Forfeited" };
     } else {
-      return {};
+      return {
+        _id: "",
+        submissionId: "",
+        rank: 0,
+        Grade: "",
+        SchoolID: 0,
+        School: "None",
+        ChoiceRank: 0,
+        lotteryList: "None",
+        adjustedRank: 0,
+        status: "No Placement",
+      };
     }
   };
 

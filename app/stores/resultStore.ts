@@ -73,6 +73,17 @@ export const useResultStore = defineStore("result-store", {
       }
       console.log(result);
     },
+    async insertResult(result: Result) {
+      try {
+        let response = await $fetch("/api/results/add", {
+          method: "POST",
+          body: result,
+        });
+        console.log(response);
+      } catch (e: any) {
+        console.log(e.message);
+      }
+    },
     async adjustRankings(ids: string[]) {
       try {
         let response = await $fetch("/api/results/adjust-rank", {

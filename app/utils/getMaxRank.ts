@@ -1,10 +1,15 @@
 import type { Result } from "~~/types/result";
 
-export default function (payload: Result, results: Result[], list: string) {
+export default function (
+  SchoolID: number,
+  Grade: string,
+  results: Result[],
+  list: string
+) {
   const filteredList: Result[] = results.filter(
     (item) =>
-      item.SchoolID === payload.SchoolID &&
-      item.Grade === payload.Grade &&
+      item.SchoolID === SchoolID &&
+      item.Grade === Grade &&
       item.lotteryList === list
   );
   const maxRank = Math.max(

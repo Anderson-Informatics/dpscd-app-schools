@@ -128,7 +128,7 @@ const columns: TableColumn<Submission>[] = [
       const sid = row.getValue('submissionId') as string
       return h(ULink, {
         to: `/submissions/${sid}`
-      }, fullname)
+      }, () => { return fullname })
     }
   },
   {

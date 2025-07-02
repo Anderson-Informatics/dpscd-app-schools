@@ -1,11 +1,15 @@
 import type { Result } from "~~/types/result";
 import type { Change } from "~~/types/change";
 import type { School } from "~~/types/school";
+import type { Qualification } from "~~/types/qualification";
+import type { Submission } from "~~/types/submission";
+import { Types } from "mongoose";
 
 export default function () {
   const toast = useToast();
   const resultStore = useResultStore();
   const changeStore = useChangeStore();
+  const submissionStore = useSubmissionStore();
   const settingsStore = useSettingsStore();
   const userStore = useAppUser();
 
@@ -31,6 +35,101 @@ export default function () {
       : null;
   };
 
+  const addResult = (payload: Qualification, submission: Submission) => {
+    console.log(`Add Result function triggered: ${JSON.stringify(payload)}`);
+    const newRank = getNewRank(payload, resultStore.results);
+    const offers = resultStore.results.filter(
+      (item: Result) =>
+        item.SchoolID === payload.SchoolID &&
+        item.Grade === payload.GradeEntering &&
+        item.lotteryList === "Offered List"
+    );
+    const waitlist = resultStore.results.filter(
+      (item: Result) =>
+        item.SchoolID === payload.SchoolID &&
+        item.Grade === payload.GradeEntering &&
+        item.lotteryList === "Waiting List"
+    );
+    let newList = "";
+    if (waitlist.length > 0) {
+      console.log(
+        `Found ${waitlist.length} applicants on the waiting list for ${payload.School}`
+      );
+      newList = "Waiting List";
+    } else if (offers.length > 0) {
+      console.log(
+        `Found ${offers.length} applicants on the offered list for ${payload.School}`
+      );
+      newList = "Offered List";
+    } else {
+      console.log(
+        `No applicants found for ${payload.School} in the offered or waiting list`
+      );
+    }
+    const newResult: Result = {
+      _id: new Types.ObjectId().toString(),
+      submissionId: payload.submissionId,
+      rank: newRank,
+      Grade: payload.GradeEntering,
+      SchoolID: payload.SchoolID,
+      School: payload.School,
+      FirstName: submission.FirstName,
+      LastName: submission.LastName,
+      ChoiceRank: 0,
+      Priority: 0,
+      TestDate: new Date(),
+      lotteryList: newList,
+      comment: "Added by user",
+      adjustedRank:
+        getMaxRank(
+          payload.SchoolID,
+          payload.GradeEntering,
+          resultStore.results,
+          newList
+        ) + 1,
+      submissionDate: submission.submissionDate,
+    };
+    console.log(`New Result: ${JSON.stringify(newResult)}`);
+    if (payload.stage === "Check") {
+      console.log("Add Result Check stage triggered");
+      pendingStatus.value = true;
+      buttonText.value = "Submit Changes";
+      pendingChanges.value.push(
+        `Add ${payload.FullName} at ${payload.School}, grade ${payload.GradeEntering} to placement results`
+      );
+      pendingIds.value.push(payload._id);
+      pendingLog.value.push({
+        submissionId: payload.submissionId,
+        change: `Add ${payload.FullName} at ${payload.School}, grade ${payload.GradeEntering} to placement results`,
+      });
+    } else if (payload.stage === "Submit Changes") {
+      console.log("Add Result Submit Changes stage triggered");
+      buttonDisabled.value = true;
+      pendingStatus.value = false;
+      const changeObj: Change = {
+        changes: pendingChanges.value,
+        ids: pendingIds.value,
+        userId: userStore.value?.user.localAccountId ?? "",
+        userEmail: userStore.value?.user.username ?? "",
+        userName: userStore.value?.user.name ?? "",
+        notes: payload.notes ?? "",
+        date: new Date(),
+        log: pendingLog.value,
+      };
+      changeStore.addChange(changeObj);
+      resultStore.insertResult(newResult);
+
+      toast.add({
+        title: "Successfully added new result",
+        description: `Changed ${payload.FullName} at ${payload.School}, grade ${payload.GradeEntering} to placement results`,
+      });
+      setTimeout(() => {
+        showModal.value = false;
+        //selectedResult.value = {};
+      }, 1000);
+    }
+  };
+
   const addToWaitingList = (payload: Result) => {
     if (payload.lotteryList === "Forfeited") {
       // This will mark the pending status and continue to similate the changes
@@ -49,7 +148,8 @@ export default function () {
       // Once changes have been similated/pending, actually make the changes
       if (payload.stage === "Submit Changes") {
         const maxRank = getMaxRank(
-          payload,
+          payload.SchoolID,
+          payload.Grade,
           resultStore.results,
           "Waiting List"
         );
@@ -295,7 +395,12 @@ export default function () {
   const moveToList = (payload: Result, list: string, changeLogged: boolean) => {
     console.log("Move to List Payload (composable function): ", payload);
     // Calculate the proper adjustedRank based on the new list
-    const maxRank = getMaxRank(payload, resultStore.results, list);
+    const maxRank = getMaxRank(
+      payload.SchoolID,
+      payload.Grade,
+      resultStore.results,
+      list
+    );
     console.log(`Testing MaxRank Calculation: ${maxRank} on ${list}`);
     // This will mark the pending status and continue to similate the changes
     if (payload.stage === "Check") {
@@ -445,7 +550,12 @@ export default function () {
         item.ChoiceRank > payload.ChoiceRank
     );
     // Use the getMaxRank util function to get the maxRank of the Offered List
-    const maxRank = getMaxRank(payload, resultStore.results, "Offered List");
+    const maxRank = getMaxRank(
+      payload.SchoolID,
+      payload.Grade,
+      resultStore.results,
+      "Offered List"
+    );
     // Run the decline offer for the other lower ranked Results
     lowerResults.forEach((item: Result) => {
       let temp = {
@@ -554,10 +664,12 @@ export default function () {
       console.log("runAction:", payload.action);
     }
   };
+
   return {
     // All we need to use is the runAction function which then
     // takes the "action" string to trigger the proper functions
     runAction,
+    addResult,
     buttonText,
     buttonDisabled,
     pendingChanges,

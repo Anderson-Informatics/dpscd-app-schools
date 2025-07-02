@@ -1,0 +1,25 @@
+export type Qualification = {
+  _id: string;
+  submissionId: string;
+  SchoolID: number;
+  School: string;
+  GradeEntering: string;
+  ChoiceRank: number;
+  GradeAvailable: boolean;
+  submissionIdInt: string;
+  FullName: string;
+  Round: string;
+  AgeEligible: boolean;
+  AgeExemption: number;
+  ExamTaken: boolean;
+  ExamScore: number;
+  ExamScoreType: string;
+  ExamScoreSort: number;
+  QualifyingScore: number;
+  Qualified: boolean;
+  Eligible: boolean;
+  EligibilityStatus: string;
+  notes?: string;
+  actionLong?: string;
+  stage?: string;
+};
