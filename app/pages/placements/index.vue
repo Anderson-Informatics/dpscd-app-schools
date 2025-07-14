@@ -497,7 +497,7 @@ const loadItem = (val: Result) => {
             <UForm :schema="schema" :state="state">
               Perform the "{{ formValues.actionLong }}" action for {{ formValues.FirstName }} {{ formValues.LastName }}
               at {{
-                formValues.School }} for the {{ formValues.Grade }} grade.<br /><br />
+              formValues.School }} for the {{ formValues.Grade }} grade.<br /><br />
               <UFormField label="Notes" name="notes">
                 <UTextarea v-model="formValues.notes" placeholder="Add your notes/reasoning for changes..."
                   class="w-full" />
@@ -550,7 +550,7 @@ const loadItem = (val: Result) => {
             { label: 'Marygrove', value: 'The School at Marygrove' },
             { label: 'Palmer Park', value: 'Palmer Park Preparatory Academy' }
           ]" :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
-            placeholder="Filter status" class="min-w-28" />
+            placeholder="Filter school" class="min-w-28" />
           <USelect v-model="listFilter" :items="[
             { label: 'All Lists', value: 'all' },
             { label: 'Offered', value: 'Offered List' },
@@ -558,7 +558,7 @@ const loadItem = (val: Result) => {
             { label: 'Forfeited', value: 'Forfeited' },
             { label: 'Secondary WL', value: 'Secondary Waitlist' }
           ]" :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
-            placeholder="Filter status" class="min-w-28" />
+            placeholder="Filter list" class="min-w-28" />
           <USelect v-model="gradeFilter" :items="[
             { label: 'All Grades', value: 'all' },
             { label: 'PreK', value: 'Pre-K' },
@@ -572,14 +572,14 @@ const loadItem = (val: Result) => {
             { label: '7', value: '7' },
             { label: '8', value: '8' }
           ]" :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
-            placeholder="Filter status" class="min-w-28" />
+            placeholder="Filter grade" class="min-w-28" />
           <USelect v-model="enrollFilter" :items="[
             { label: 'All Enrollment', value: 'all' },
             { label: 'Enrolled', value: true },
             { label: 'Not Enrolled', value: false },
             { label: 'Unknown', value: null }
           ]" :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
-            placeholder="Filter status" class="min-w-28" />
+            placeholder="Filter enrollment" class="min-w-28" />
           <UButton type="button" @click="console.log(schoolFilter, listFilter, gradeFilter)" icon="i-lucide-folder-down"
             class="bg-primary-500 hover:bg-primary-600 text-white font-bold">
             <DownloadExcel :data="table?.tableApi?.getFilteredRowModel().rows.map((row) => row.original)" type="xlsx"
