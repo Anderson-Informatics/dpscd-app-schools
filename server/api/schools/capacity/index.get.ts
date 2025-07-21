@@ -39,6 +39,18 @@ export default defineEventHandler(async (event) => {
                   {
                     $eq: ["Waiting List", "$lotteryList"],
                   },
+                ],
+              },
+              then: 1,
+              else: 0,
+            },
+          },
+        },
+        OnSecondaryWaitingList: {
+          $sum: {
+            $cond: {
+              if: {
+                $or: [
                   {
                     $eq: ["Secondary Waitlist", "$lotteryList"],
                   },
@@ -64,7 +76,7 @@ export default defineEventHandler(async (event) => {
       SchoolID: Number(object.SchoolID),
       School: object.SchoolName,
       Grade: item,
-      Capacity: object.Capacity[item],
+      Capacity: object.Capacity[item] ?? 0,
     }));
   };
 
@@ -97,6 +109,7 @@ export default defineEventHandler(async (event) => {
     Capacity: number;
     SeatsFilled: number;
     OnWaitingList: number;
+    OnSecondaryWaitingList: number;
   }[] = [];
 
   seats.forEach((seat) => {

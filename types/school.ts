@@ -32,4 +32,5 @@ export type Count = {
   };
   SeatsFilled: number;
   OnWaitingList: number;
+  OnSecondaryWaitingList: number;
 };

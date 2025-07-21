@@ -212,6 +212,24 @@ const columns: TableColumn<SchoolGrade>[] = [
     }
   },
   {
+    accessorKey: 'OnSecondaryWaitingList',
+    header: ({ column }) => {
+      const isSorted = column.getIsSorted()
+      return h(UButton, {
+        color: 'neutral',
+        variant: 'ghost',
+        label: 'On Seconday WL',
+        icon: isSorted
+          ? isSorted === 'asc'
+            ? 'i-lucide-arrow-up-narrow-wide'
+            : 'i-lucide-arrow-down-wide-narrow'
+          : 'i-lucide-arrow-up-down',
+        class: '-mx-2.5',
+        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+      })
+    }
+  },
+  {
     accessorKey: 'SeatsAvailable',
     header: ({ column }) => {
       const isSorted = column.getIsSorted()
