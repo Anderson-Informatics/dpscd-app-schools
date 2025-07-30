@@ -1,47 +1,30 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
 import { upperFirst } from 'scule'
-import { getPaginationRowModel, type Row } from '@tanstack/table-core'
+import { getPaginationRowModel } from '@tanstack/table-core'
 import type { User } from '~/types'
-import type { Result } from '~~/types/result'
-import * as z from 'zod'
-import type { FormSubmitEvent } from '@nuxt/ui'
 import type { SchoolGrade } from '~~/types/school'
 
-const schema = z.object({
-  notes: z.string(),
-})
-type Schema = z.output<typeof schema>
-
-const state = reactive<Partial<Schema>>({
-  notes: '',
-})
-
 // Load all of the key placement change functions/refs from composable
-const actions = useActions()
 
 const UButton = resolveComponent('UButton')
 const UDropdownMenu = resolveComponent('UDropdownMenu')
-const UCheckbox = resolveComponent('UCheckbox')
 
-const toast = useToast()
 const table = useTemplateRef('table')
-
 
 // Get the results and schools data from the Pinia store
 const resultStore = useResultStore()
-await useAsyncData("results", () => resultStore.getAll(), {})
-await useAsyncData("pendingOffers", () => resultStore.getPending(), {});
-await useAsyncData("schools", () => resultStore.getSchools(), {})
-await useAsyncData("capacity", () => resultStore.getCapacity(), {});
+await useAsyncData('results', () => resultStore.getAll(), {})
+await useAsyncData('pendingOffers', () => resultStore.getPending(), {});
+await useAsyncData('schools', () => resultStore.getSchools(), {})
+await useAsyncData('capacity', () => resultStore.getCapacity(), {});
 const changeStore = useChangeStore()
-await useAsyncData("changes", () => changeStore.getAll(), {})
+await useAsyncData('changes', () => changeStore.getAll(), {})
 const settingsStore = useSettingsStore()
-await useAsyncData("settings", () => settingsStore.getSettings(), {})
+await useAsyncData('settings', () => settingsStore.getSettings(), {})
 
-const columnVisibility = ref({ '_id': false })
+const columnVisibility = ref({ _id: false })
 const rowSelection = ref({})
-const statusFilter = ref('all')
 const schoolFilter = ref('all')
 const listFilter = ref('all')
 const gradeFilter = ref('all')
@@ -88,34 +71,7 @@ watch(() => gradeFilter.value, (newVal) => {
 const { data, status } = await useFetch<User[]>('/api/customers', {
   lazy: true
 })
-
-function getRowItems(row: Row<SchoolGrade>) {
-  return [
-    {
-      type: 'label',
-      label: 'Actions'
-    },
-    {
-      type: 'separator'
-    },
-    /*
-    {
-      type: 'separator'
-    },
-    {
-      label: 'Delete customer',
-      icon: 'i-lucide-trash',
-      color: 'error',
-      onSelect() {
-        toast.add({
-          title: 'Customer deleted',
-          description: 'The customer has been deleted.'
-        })
-      }
-    }
-    */
-  ]
-}
+console.log('Customers data:', data.value)
 
 const columns: TableColumn<SchoolGrade>[] = [
   {
@@ -247,31 +203,6 @@ const columns: TableColumn<SchoolGrade>[] = [
         onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
       })
     }
-  },
-  {
-    id: 'actions',
-    cell: ({ row }) => {
-      return h(
-        'div',
-        { class: 'text-right' },
-        h(
-          UDropdownMenu,
-          {
-            content: {
-              align: 'end'
-            },
-            items: getRowItems(row)
-          },
-          () =>
-            h(UButton, {
-              icon: 'i-lucide-ellipsis-vertical',
-              color: 'neutral',
-              variant: 'ghost',
-              class: 'ml-auto'
-            })
-        )
-      )
-    }
   }
 ]
 
@@ -288,33 +219,6 @@ const pagination = ref({
   pageIndex: 0,
   pageSize: 10
 })
-
-// Helpers for the edit modal component
-const formValues = ref<Result>({
-  _id: '',
-  submissionId: '',
-  rank: 0,
-  Grade: '',
-  SchoolID: 0,
-  School: '',
-  FirstName: '',
-  LastName: '',
-  ChoiceRank: 0,
-  submissionDate: '',
-  lotteryList: ''
-})
-
-// This will reset the edit modal component
-const loadItem = (val: Result) => {
-  console.log("loadItem: ", val)
-  formValues.value = val
-  actions.showModal.value = true
-  // These are the empty starting defaults for the form
-  actions.pendingChanges.value = []
-  actions.pendingStatus.value = false
-  actions.buttonText.value = "Check"
-  actions.pendingIds.value = []
-}
 </script>
 
 <template>
@@ -324,67 +228,13 @@ const loadItem = (val: Result) => {
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
-
-        <template #right>
-          <CustomersAddModal />
-        </template>
       </UDashboardNavbar>
     </template>
 
     <template #body>
       <div class="flex flex-wrap items-center justify-between gap-1.5">
-        <UModal v-model:open="actions.showModal.value" title="Offer Queue Update Form"
-          description="Verify and log changes to offers in queue" :ui="{ footer: 'justify-end' }">
-          <!--
-          <UButton label="Open" color="neutral" variant="subtle" />
-          -->
-
-          <template #body>
-            {{ formValues }}
-            <UForm :schema="schema" :state="state">
-              {{ formValues.action }} for {{ formValues.FirstName }} {{ formValues.LastName }}
-              <UFormField label="Notes" name="notes">
-                <UTextarea v-model="formValues.notes" placeholder="Add your notes/reasoning for changes..."
-                  class="w-full" />
-              </UFormField>
-              <div v-if="actions.pendingChanges.value.length > 0">
-                <p class="mt-6 text-lg">Pending changes:</p>
-                <ol class="text-left list-decimal list-inside mt-2 mb-4">
-                  <li v-for="(change, index) in actions.pendingChanges.value" class="mb-2">
-                    {{ change }}
-                  </li>
-                </ol>
-              </div>
-            </UForm>
-          </template>
-
-          <template #footer>
-            <UButton label="Cancel" color="neutral" variant="outline"
-              @click="actions.showModal.value = false; actions.buttonText.value = 'Check'" />
-            <UButton :label="actions.buttonText.value" color="neutral"
-              @click="actions.runAction({ ...formValues, stage: actions.buttonText.value })" />
-          </template>
-        </UModal>
-        <!--
-        <UInput :model-value="(table?.tableApi?.getColumn('FirstName')?.getFilterValue() as string)" class="max-w-sm"
-          icon="i-lucide-search" placeholder="Find by first name..."
-          @update:model-value="table?.tableApi?.getColumn('FirstName')?.setFilterValue($event)" />
-        -->
         <UInput v-model="globalFilter" class="max-w-sm" placeholder="Filter..." />
-
         <div class="flex flex-wrap items-center gap-1.5">
-          <CustomersDeleteModal :count="table?.tableApi?.getFilteredSelectedRowModel().rows.length">
-            <UButton v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Delete" color="error"
-              variant="subtle" icon="i-lucide-trash">
-              <template #trailing>
-                <UKbd>
-                  {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}
-                </UKbd>
-              </template>
-            </UButton>
-          </CustomersDeleteModal>
-
-
           <USelect v-model="schoolFilter" :items="[
             { label: 'All Schools', value: 'all' },
             { label: 'Bates', value: 'Bates Academy' },

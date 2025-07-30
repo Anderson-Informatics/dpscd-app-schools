@@ -1,3 +1,6 @@
+<!-- eslint-disable vue/max-attributes-per-line -->
+<!-- eslint-disable vue/first-attribute-linebreak -->
+<!-- eslint-disable vue/first-attribute-linebreak -->
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
 import { upperFirst } from 'scule'
@@ -30,15 +33,15 @@ const table = useTemplateRef('table')
 
 // Get the results and schools data from the Pinia store
 const resultStore = useResultStore()
-await useAsyncData("results", () => resultStore.getAll(), {})
-await useAsyncData("pendingOffers", () => resultStore.getPending(), {});
-await useAsyncData("schools", () => resultStore.getSchools(), {})
+await useAsyncData('results', () => resultStore.getAll(), {})
+await useAsyncData('pendingOffers', () => resultStore.getPending(), {});
+await useAsyncData('schools', () => resultStore.getSchools(), {})
 const changeStore = useChangeStore()
-await useAsyncData("changes", () => changeStore.getAll(), {})
+await useAsyncData('changes', () => changeStore.getAll(), {})
 const settingsStore = useSettingsStore()
-await useAsyncData("settings", () => settingsStore.getSettings(), {})
+await useAsyncData('settings', () => settingsStore.getSettings(), {})
 
-const columnVisibility = ref({ '_id': false })
+const columnVisibility = ref({ _id: false })
 const rowSelection = ref({})
 const schoolFilter = ref('all')
 const listFilter = ref('all')
@@ -97,7 +100,7 @@ watch(() => enrollFilter.value, (newVal) => {
   }
 })
 
-const { data, status } = await useFetch<User[]>('/api/customers', {
+const { status } = await useFetch<User[]>('/api/customers', {
   lazy: true
 })
 
@@ -231,7 +234,7 @@ const columns: TableColumn<Result>[] = [
   */
   {
     accessorKey: '_id',
-    header: 'ID',
+    header: 'ID'
   },
   {
     accessorKey: 'FirstName',
@@ -363,7 +366,7 @@ const columns: TableColumn<Result>[] = [
       return h(UButton, {
         label: status,
         color: status === 'Offered List' ? 'success' : status === 'Waiting List' ? 'info' : status === 'Secondary Waitlist' ? 'warning' : status === 'Forfeited' ? 'error' : 'neutral',
-        variant: 'subtle',
+        variant: 'subtle'
       })
     }
   },
@@ -375,7 +378,7 @@ const columns: TableColumn<Result>[] = [
       return h(UButton, {
         label: status,
         color: status === 'Offer Pending' ? 'success' : 'content-none',
-        variant: 'subtle',
+        variant: 'subtle'
       })
     }
   },
@@ -457,13 +460,13 @@ const formValues = ref<Result>({
 
 // This will reset the edit modal component
 const loadItem = (val: Result) => {
-  console.log("loadItem: ", val)
+  console.log('loadItem: ', val)
   formValues.value = val
   actions.showModal.value = true
   // These are the empty starting defaults for the form
   actions.pendingChanges.value = []
   actions.pendingStatus.value = false
-  actions.buttonText.value = "Check"
+  actions.buttonText.value = 'Check'
   actions.buttonDisabled.value = false
   actions.pendingIds.value = []
   actions.pendingLog.value = []

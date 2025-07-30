@@ -17,7 +17,7 @@ export const useResultStore = defineStore("result-store", {
     // Get all results from DB
     async getAll() {
       try {
-        let data = await $fetch<Result[]>("/api/results");
+        const data = await $fetch<Result[]>("/api/results");
         this.results = data;
         return data;
       } catch (e: any) {
@@ -26,7 +26,7 @@ export const useResultStore = defineStore("result-store", {
     },
     async getPending() {
       try {
-        let data = await $fetch<Result[]>("/api/results/pending");
+        const data = await $fetch<Result[]>("/api/results/pending");
         this.pendingOffers = data;
         return data;
       } catch (e: any) {
@@ -35,7 +35,7 @@ export const useResultStore = defineStore("result-store", {
     },
     async getSchools() {
       try {
-        let data = await $fetch<School[]>("/api/schools");
+        const data = await $fetch<School[]>("/api/schools");
         this.schools = data;
       } catch (e: any) {
         console.log(e.message);
@@ -43,7 +43,7 @@ export const useResultStore = defineStore("result-store", {
     },
     async getCapacity() {
       try {
-        let data = await $fetch("/api/schools/capacity");
+        const data = await $fetch("/api/schools/capacity");
         this.capacity = data;
       } catch (e: any) {
         console.log(e.message);
@@ -51,7 +51,7 @@ export const useResultStore = defineStore("result-store", {
     },
     async updateCapacity(school: SchoolGrade) {
       try {
-        let response = await $fetch(`/api/schools/capacity/update`, {
+        const response = await $fetch(`/api/schools/capacity/update`, {
           method: "POST",
           body: school,
         });
@@ -63,7 +63,7 @@ export const useResultStore = defineStore("result-store", {
     },
     async updateResult(result: Result) {
       try {
-        let response = await $fetch<Result>(`/api/results/${result._id}`, {
+        const response = await $fetch<Result>(`/api/results/${result._id}`, {
           method: "POST",
           body: result.update,
         });
@@ -75,7 +75,7 @@ export const useResultStore = defineStore("result-store", {
     },
     async insertResult(result: Result) {
       try {
-        let response = await $fetch("/api/results/add", {
+        const response = await $fetch("/api/results/add", {
           method: "POST",
           body: result,
         });
@@ -86,7 +86,7 @@ export const useResultStore = defineStore("result-store", {
     },
     async adjustRankings(ids: string[]) {
       try {
-        let response = await $fetch("/api/results/adjust-rank", {
+        const response = await $fetch("/api/results/adjust-rank", {
           method: "POST",
           body: {
             ids: ids,
@@ -98,9 +98,9 @@ export const useResultStore = defineStore("result-store", {
       }
       console.log(ids);
     },
-    async addLabel(result: Result, type: String) {
+    async addLabel(result: Result, type: string) {
       try {
-        let response = await $fetch("/api/submittable/add", {
+        const response = await $fetch("/api/submittable/add", {
           method: "POST",
           body: { ...result, type: type },
         });
@@ -109,9 +109,9 @@ export const useResultStore = defineStore("result-store", {
         console.log(e.message);
       }
     },
-    async deleteLabel(result: Result, type: String) {
+    async deleteLabel(result: Result, type: string) {
       try {
-        let response = await $fetch("/api/submittable/delete", {
+        const response = await $fetch("/api/submittable/delete", {
           method: "POST",
           body: { ...result, type: type },
         });

@@ -1,70 +1,70 @@
-import type { Result } from "~~/types/result";
-import type { Change } from "~~/types/change";
-import type { School } from "~~/types/school";
-import type { Qualification } from "~~/types/qualification";
-import type { Submission } from "~~/types/submission";
-import { Types } from "mongoose";
+import { Types } from 'mongoose'
+import type { Result } from '~~/types/result'
+import type { Change } from '~~/types/change'
+import type { School } from '~~/types/school'
+import type { Qualification } from '~~/types/qualification'
+import type { Submission } from '~~/types/submission'
 
 export default function () {
-  const toast = useToast();
-  const resultStore = useResultStore();
-  const changeStore = useChangeStore();
-  const submissionStore = useSubmissionStore();
-  const settingsStore = useSettingsStore();
-  const userStore = useAppUser();
+  const toast = useToast()
+  const resultStore = useResultStore()
+  const changeStore = useChangeStore()
+  // const submissionStore = useSubmissionStore()
+  const settingsStore = useSettingsStore()
+  const userStore = useAppUser()
 
-  const showModal = ref<boolean>(false);
-  const pendingChanges = ref<string[]>([]);
-  const pendingStatus = ref<boolean>(false);
-  const buttonText = ref<string>("Check");
-  const buttonDisabled = ref<boolean>(false);
-  const pendingIds = ref<string[]>([]);
+  const showModal = ref<boolean>(false)
+  const pendingChanges = ref<string[]>([])
+  const pendingStatus = ref<boolean>(false)
+  const buttonText = ref<string>('Check')
+  const buttonDisabled = ref<boolean>(false)
+  const pendingIds = ref<string[]>([])
   const pendingLog = ref<
     Array<{ submissionId: string; change: string } | null>
-  >([]);
-  const changeLogged = ref<boolean>(false);
+  >([])
+  const changeLogged = ref<boolean>(false)
 
   const addLabel = (payload: Result, type: string) => {
     settingsStore.settings.applyLabels
       ? resultStore.addLabel(payload, type)
-      : null;
-  };
+      : null
+  }
   const deleteLabel = (payload: Result, type: string) => {
     settingsStore.settings.applyLabels
       ? resultStore.deleteLabel(payload, type)
-      : null;
-  };
+      : null
+  }
 
   const addResult = (payload: Qualification, submission: Submission) => {
-    console.log(`Add Result function triggered: ${JSON.stringify(payload)}`);
-    const newRank = getNewRank(payload, resultStore.results);
+    console.log(`Add Result function triggered: ${JSON.stringify(payload)}`)
+    const newRank = getNewRank(payload, resultStore.results)
     const offers = resultStore.results.filter(
       (item: Result) =>
         item.SchoolID === payload.SchoolID &&
         item.Grade === payload.GradeEntering &&
-        item.lotteryList === "Offered List"
-    );
+        item.lotteryList === 'Offered List'
+    )
     const waitlist = resultStore.results.filter(
       (item: Result) =>
         item.SchoolID === payload.SchoolID &&
         item.Grade === payload.GradeEntering &&
-        item.lotteryList === "Waiting List"
-    );
-    let newList = "";
+        item.lotteryList === 'Waiting List'
+    )
+    let newList = ''
     if (waitlist.length > 0) {
       console.log(
         `Found ${waitlist.length} applicants on the waiting list for ${payload.School}`
-      );
-      newList = "Waiting List";
+      )
+      newList = 'Waiting List'
     } else if (offers.length > 0) {
       console.log(
         `Found ${offers.length} applicants on the offered list for ${payload.School}`
-      );
-      newList = "Offered List";
+      )
+      newList = 'Offered List'
     } else {
       console.log(
         `No applicants found for ${payload.School} in the offered or waiting list`
-      );
+      )
     }
     const newResult: Result = {
       _id: new Types.ObjectId().toString(),
@@ -79,7 +79,7 @@ export default function () {
       Priority: 0,
       TestDate: new Date(),
       lotteryList: newList,
-      comment: "Added by user",
+      comment: 'Added by user',
       adjustedRank:
         getMaxRank(
           payload.SchoolID,
@@ -87,123 +87,53 @@ export default function () {
           resultStore.results,
           newList
         ) + 1,
-      submissionDate: submission.submissionDate,
-    };
-    console.log(`New Result: ${JSON.stringify(newResult)}`);
-    if (payload.stage === "Check") {
-      console.log("Add Result Check stage triggered");
-      pendingStatus.value = true;
-      buttonText.value = "Submit Changes";
+      submissionDate: submission.submissionDate
+    }
+    console.log(`New Result: ${JSON.stringify(newResult)}`)
+    if (payload.stage === 'Check') {
+      console.log('Add Result Check stage triggered')
+      pendingStatus.value = true
+      buttonText.value = 'Submit Changes'
       pendingChanges.value.push(
         `Add ${payload.FullName} at ${payload.School}, grade ${payload.GradeEntering} to placement results`
-      );
-      pendingIds.value.push(payload._id);
+      )
+      pendingIds.value.push(payload._id)
       pendingLog.value.push({
         submissionId: payload.submissionId,
-        change: `Add ${payload.FullName} at ${payload.School}, grade ${payload.GradeEntering} to placement results`,
-      });
-    } else if (payload.stage === "Submit Changes") {
-      console.log("Add Result Submit Changes stage triggered");
-      buttonDisabled.value = true;
-      pendingStatus.value = false;
+        change: `Add ${payload.FullName} at ${payload.School}, grade ${payload.GradeEntering} to placement results`
+      })
+    } else if (payload.stage === 'Submit Changes') {
+      console.log('Add Result Submit Changes stage triggered')
+      buttonDisabled.value = true
+      pendingStatus.value = false
       const changeObj: Change = {
         changes: pendingChanges.value,
         ids: pendingIds.value,
-        userId: userStore.value?.user.localAccountId ?? "",
-        userEmail: userStore.value?.user.username ?? "",
-        userName: userStore.value?.user.name ?? "",
-        notes: payload.notes ?? "",
+        userId: userStore.value?.user.localAccountId ?? '',
+        userEmail: userStore.value?.user.username ?? '',
+        userName: userStore.value?.user.name ?? '',
+        notes: payload.notes ?? '',
         date: new Date(),
-        log: pendingLog.value,
-      };
-      changeStore.addChange(changeObj);
-      resultStore.insertResult(newResult);
+        log: pendingLog.value
+      }
+      changeStore.addChange(changeObj)
+      resultStore.insertResult(newResult)
 
       toast.add({
-        title: "Successfully added new result",
-        description: `Changed ${payload.FullName} at ${payload.School}, grade ${payload.GradeEntering} to placement results`,
-      });
+        title: 'Successfully added new result',
+        description: `Changed ${payload.FullName} at ${payload.School}, grade ${payload.GradeEntering} to placement results`
+      })
       setTimeout(() => {
-        showModal.value = false;
-        //selectedResult.value = {};
-      }, 1000);
+        showModal.value = false
+        // selectedResult.value = {};
+      }, 1000)
     }
-  };
-
-  const addToWaitingList = (payload: Result) => {
-    if (payload.lotteryList === "Forfeited") {
-      // This will mark the pending status and continue to similate the changes
-      if (payload.stage === "Check") {
-        pendingStatus.value = true;
-        buttonText.value = "Submit Changes";
-        pendingChanges.value.push(
-          `Change ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade} from '${payload.lotteryList}' to 'Waiting List'`
-        );
-        pendingIds.value.push(payload._id);
-        pendingLog.value.push({
-          submissionId: payload.submissionId,
-          change: `Change ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade} from '${payload.lotteryList}' to 'Waiting List'`,
-        });
-      }
-      // Once changes have been similated/pending, actually make the changes
-      if (payload.stage === "Submit Changes") {
-        const maxRank = getMaxRank(
-          payload.SchoolID,
-          payload.Grade,
-          resultStore.results,
-          "Waiting List"
-        );
-        console.log(`Waiting list max rank: ${maxRank}`);
-        // add the pending changes to the history log
-        const changeObj: Change = {
-          changes: pendingChanges.value,
-          ids: pendingIds.value,
-          userId: userStore.value?.user.localAccountId ?? "",
-          userEmail: userStore.value?.user.username ?? "",
-          userName: userStore.value?.user.name ?? "",
-          notes: payload.notes ?? "",
-          date: new Date(),
-          log: pendingLog.value,
-        };
-        changeStore.addChange(changeObj);
-        // Update the Pinia store for the result being changed to "Decline"
-        const waitlistObj = resultStore.results.find(
-          (item: Result) => item._id === payload._id
-        );
-        if (waitlistObj) {
-          waitlistObj.lotteryList = "Waiting List";
-          waitlistObj.adjustedRank = maxRank + 1;
-          // Send the decline information to update
-          resultStore.updateResult({
-            ...waitlistObj,
-            update: {
-              lotteryList: "Waiting List",
-              adjustedRank: maxRank + 1,
-            },
-          });
-          toast.add({
-            title: "Successfully added to waiting list",
-            description: `Moved ${waitlistObj.FirstName} ${waitlistObj.LastName} to the Waiting List`,
-          });
-        } else {
-          console.log("No matching result found");
-        }
-        toast.add({
-          title: "Successfully added to waiting list",
-          description: `Changed ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade} from '${payload.lotteryList}' to 'Waiting List'`,
-        });
-        setTimeout(() => {
-          showModal.value = false;
-          //selectedResult.value = {};
-        }, 1000);
-      }
-    }
-  };
+  }
 
   const adjustRankings = (payload: Result) => {
-    console.log("Adjust Rankings function triggered");
+    console.log('Adjust Rankings function triggered')
     // filter to the same school, grade, and lotteryList and lower ranked results
-    let filtered = resultStore.results.filter((item: Result) =>
+    const filtered = resultStore.results.filter((item: Result) =>
       item.SchoolID === payload.SchoolID &&
       item.Grade === payload.Grade &&
       item.lotteryList === payload.lotteryList &&
@@ -213,54 +143,54 @@ export default function () {
           payload.adjustedRank !== null &&
           item.adjustedRank > payload.adjustedRank
         : false
-    );
+    )
     // This will prevent the additional "change" of not moving any up the forfeited list
-    if (payload.lotteryList === "Forfeited") {
-      return;
+    if (payload.lotteryList === 'Forfeited') {
+      return
     }
     // Create an Array of ids from the lower ranked results
-    let ids: string[] = filtered.map((item: Result) => item._id);
-    if (payload.stage === "Check") {
+    const ids: string[] = filtered.map((item: Result) => item._id)
+    if (payload.stage === 'Check') {
       // Add info to pending changes array to display as interim step
       pendingChanges.value.push(
         `Move ${ids.length} applicants up the ${payload.lotteryList}`
-      );
+      )
     }
-    if (payload.stage === "Submit Changes") {
+    if (payload.stage === 'Submit Changes') {
       // Update the filtered Pinia Store
       filtered.forEach((item) => {
-        item.adjustedRank = (item.adjustedRank ?? 0) - 1;
-      });
+        item.adjustedRank = (item.adjustedRank ?? 0) - 1
+      })
       // Deal with shallowRef limitation of TanStack table
-      resultStore.results = [...resultStore.results];
+      resultStore.results = [...resultStore.results]
       // Send the ids to update the list rankings
-      resultStore.adjustRankings(ids);
-      //resultStore.adjustRankings(payload);
+      resultStore.adjustRankings(ids)
+      // resultStore.adjustRankings(payload);
       toast.add({
-        title: "Waitlist Successfully Adjusted",
-        description: `Moved ${ids.length} applicants up the ${payload.lotteryList}`,
-      });
+        title: 'Waitlist Successfully Adjusted',
+        description: `Moved ${ids.length} applicants up the ${payload.lotteryList}`
+      })
     }
-  };
+  }
 
   // This will check for available seats and run the makeOffer function if seats available
   const checkWaitlist = (payload: Result) => {
-    console.log("Check Waitlist Function Triggered");
+    console.log('Check Waitlist Function Triggered')
     // Get the capacity for the selected school
     const school = resultStore.schools.find(
       (item: School) => item.SchoolID === payload.SchoolID
-    );
+    )
 
     if (!school || !school.Capacity[payload.Grade]) {
-      console.error("School or capacity not found for the given grade.");
-      return;
+      console.error('School or capacity not found for the given grade.')
+      return
     }
 
-    const capacity = school.Capacity[payload.Grade];
+    const capacity = school.Capacity[payload.Grade]
 
     if (capacity === undefined) {
-      console.error("Capacity is undefined for the given grade.");
-      return;
+      console.error('Capacity is undefined for the given grade.')
+      return
     }
 
     // Calculate the number of seats filled
@@ -269,401 +199,403 @@ export default function () {
         item.SchoolID === payload.SchoolID &&
         item.Grade === payload.Grade &&
         // Fix this to account for offer pending students
-        (item.lotteryList === "Offered List" ||
-          item.queueStatus === "Offer Pending")
-    ).length;
+        (item.lotteryList === 'Offered List' ||
+          item.queueStatus === 'Offer Pending')
+    ).length
     if (filled <= capacity) {
-      makeOffer(payload);
+      makeOffer(payload)
     }
-  };
+  }
 
   const confirmEnrollment = (payload: Result) => {
     // This will mark the pending status and continue to simulate the changes
-    if (payload.stage === "Check") {
-      pendingStatus.value = true;
-      buttonText.value = "Submit Changes";
+    if (payload.stage === 'Check') {
+      pendingStatus.value = true
+      buttonText.value = 'Submit Changes'
       pendingChanges.value.push(
         `Confirm Enrollment for ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade}`
-      );
-      pendingIds.value.push(payload._id);
+      )
+      pendingIds.value.push(payload._id)
       pendingLog.value.push({
         submissionId: payload.submissionId,
-        change: `Confirm Enrollment for ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade}`,
-      });
+        change: `Confirm Enrollment for ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade}`
+      })
     }
-    if (payload.stage === "Submit Changes") {
+    if (payload.stage === 'Submit Changes') {
       // Disable the button to prevent double clicking
-      buttonDisabled.value = true;
+      buttonDisabled.value = true
       // add the pending changes to the history log
       const changeObj: Change = {
         changes: pendingChanges.value,
         ids: pendingIds.value,
-        userId: userStore.value?.user.localAccountId ?? "",
-        userEmail: userStore.value?.user.username ?? "",
-        userName: userStore.value?.user.name ?? "",
-        notes: payload.notes ?? "",
+        userId: userStore.value?.user.localAccountId ?? '',
+        userEmail: userStore.value?.user.username ?? '',
+        userName: userStore.value?.user.name ?? '',
+        notes: payload.notes ?? '',
         date: new Date(),
-        log: pendingLog.value,
-      };
-      changeStore.addChange(changeObj);
+        log: pendingLog.value
+      }
+      changeStore.addChange(changeObj)
       // Update the Pinia store for the result being changed to "Decline"
       const updObj = resultStore.results.find(
         (item: Result) => item._id === payload._id
-      );
+      )
       if (updObj) {
         // Update Pinia store for updated object
-        updObj.confirmedEnrollment = true;
+        updObj.confirmedEnrollment = true
         // Deal with shallowRef limitation of TanStack table
-        resultStore.results = [...resultStore.results];
+        resultStore.results = [...resultStore.results]
         // Send change to database
         resultStore.updateResult({
           ...updObj,
           update: {
-            confirmedEnrollment: true,
-          },
-        });
+            confirmedEnrollment: true
+          }
+        })
         toast.add({
-          title: "Successfully Confirmed Enrollment",
-          description: `Confirm Enrollment for ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade}`,
-        });
+          title: 'Successfully Confirmed Enrollment',
+          description: `Confirm Enrollment for ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade}`
+        })
         setTimeout(() => {
-          showModal.value = false;
-          //selectedResult.value = {};
-        }, 1000);
+          showModal.value = false
+          // selectedResult.value = {};
+        }, 1000)
       } else {
-        console.log("No matching result found");
+        console.log('No matching result found')
       }
     }
-  };
+  }
 
   // This is the function to pull an applicant off the waitlist
   const makeOffer = (payload: Result) => {
-    console.log("Make Offer Function triggered");
+    console.log('Make Offer Function triggered')
     const offer: Result | undefined = resultStore.results
       .filter(
         (item: Result) =>
           item.SchoolID === payload.SchoolID &&
           item.Grade === payload.Grade &&
-          item.lotteryList === "Waiting List" &&
-          item.queueStatus !== "Offer Pending"
+          item.lotteryList === 'Waiting List' &&
+          item.queueStatus !== 'Offer Pending'
       )
       .sort(
         (a: Result, b: Result) => (a.adjustedRank ?? 0) - (b.adjustedRank ?? 0)
-      )[0];
+      )[0]
     if (!offer) {
-      console.log("No matching offer found.");
-      return;
+      console.log('No matching offer found.')
+      return
     }
-    if (payload.stage === "Check") {
+    if (payload.stage === 'Check') {
       // Update pending information before pushing new information
       pendingChanges.value.push(
         `Add ${offer.FirstName} ${offer.LastName} at ${offer.School}, grade ${offer.Grade} to 'Offer Pending' list`
-      );
-      pendingIds.value.push(offer._id);
+      )
+      pendingIds.value.push(offer._id)
       pendingLog.value.push({
         submissionId: payload.submissionId,
-        change: `Add ${offer.FirstName} ${offer.LastName} at ${offer.School}, grade ${offer.Grade} to 'Offer Pending' list`,
-      });
+        change: `Add ${offer.FirstName} ${offer.LastName} at ${offer.School}, grade ${offer.Grade} to 'Offer Pending' list`
+      })
     }
-    if (payload.stage === "Submit Changes") {
+    if (payload.stage === 'Submit Changes') {
       // This updates the pinia state directly WOW!
-      offer.queueStatus = "Offer Pending";
-      offer.queueDate = new Date();
+      offer.queueStatus = 'Offer Pending'
+      offer.queueDate = new Date()
       // Add this to deal with shallowRef limitation of TanStack table
-      resultStore.results = [...resultStore.results];
+      resultStore.results = [...resultStore.results]
       // Update the result in the database using the Pinia store action updateResult
       resultStore.updateResult({
         ...offer,
         update: {
-          queueStatus: "Offer Pending",
-          queueDate: new Date(),
-        },
-      });
+          queueStatus: 'Offer Pending',
+          queueDate: new Date()
+        }
+      })
+      // Add Offer Pending label to submittable
+      addLabel(offer, 'Offer Pending')
       // Also handle the change to the pending offer store add the offer to the pendingOffers
-      resultStore.pendingOffers.push(offer); // This just gives the basic row data without the detailed info
+      resultStore.pendingOffers.push(offer) // This just gives the basic row data without the detailed info
       // This was added to fix the shallowRef limitation of TanStack table data reactivity
-      resultStore.pendingOffers = [...resultStore.pendingOffers];
+      resultStore.pendingOffers = [...resultStore.pendingOffers]
 
       toast.add({
-        title: "Successfully Made Offer",
-        description: `Added ${offer.FirstName} ${offer.LastName} at ${offer.School}, grade ${offer.Grade} to 'Offer Pending' list`,
-      });
+        title: 'Successfully Made Offer',
+        description: `Added ${offer.FirstName} ${offer.LastName} at ${offer.School}, grade ${offer.Grade} to 'Offer Pending' list`
+      })
     }
-    //adjustRankings(offer);
-  };
+    // adjustRankings(offer);
+  }
 
   const moveToList = (payload: Result, list: string, changeLogged: boolean) => {
-    console.log("Move to List Payload (composable function): ", payload);
+    console.log('Move to List Payload (composable function): ', payload)
     // Calculate the proper adjustedRank based on the new list
     const maxRank = getMaxRank(
       payload.SchoolID,
       payload.Grade,
       resultStore.results,
       list
-    );
-    console.log(`Testing MaxRank Calculation: ${maxRank} on ${list}`);
+    )
+    console.log(`Testing MaxRank Calculation: ${maxRank} on ${list}`)
     // This will mark the pending status and continue to similate the changes
-    if (payload.stage === "Check") {
-      pendingStatus.value = true;
-      buttonText.value = "Submit Changes";
+    if (payload.stage === 'Check') {
+      pendingStatus.value = true
+      buttonText.value = 'Submit Changes'
       pendingChanges.value.push(
         `Change ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade} from '${payload.lotteryList}' to '${list}'`
-      );
-      pendingIds.value.push(payload._id);
+      )
+      pendingIds.value.push(payload._id)
       pendingLog.value.push({
         submissionId: payload.submissionId,
-        change: `Change ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade} from '${payload.lotteryList}' to '${list}'`,
-      });
+        change: `Change ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade} from '${payload.lotteryList}' to '${list}'`
+      })
     }
-    console.log("Pending Changes: ", pendingChanges.value);
+    console.log('Pending Changes: ', pendingChanges.value)
     // Will run everytime to simulate the changes and/or make the changes
-    adjustRankings(payload);
+    adjustRankings(payload)
     if (
-      (payload.lotteryList === "Offered List" ||
-        payload.queueStatus === "Offer Pending") &&
-      (list === "Forfeited" || list === "Secondary Waitlist")
+      (payload.lotteryList === 'Offered List' ||
+        payload.queueStatus === 'Offer Pending') &&
+      (list === 'Forfeited' || list === 'Secondary Waitlist')
     ) {
-      checkWaitlist(payload);
+      checkWaitlist(payload)
     }
     // Once changes have been similated/pending, actually make the changes
-    if (payload.stage === "Submit Changes") {
+    if (payload.stage === 'Submit Changes') {
       // Disable the button to prevent double clicking
-      buttonDisabled.value = true;
+      buttonDisabled.value = true
       // add the pending changes to the history log
       const changeObj: Change = {
         changes: pendingChanges.value,
         ids: pendingIds.value,
-        userId: userStore.value?.user.localAccountId ?? "",
-        userEmail: userStore.value?.user.username ?? "",
-        userName: userStore.value?.user.name ?? "",
-        notes: payload.notes ?? "",
+        userId: userStore.value?.user.localAccountId ?? '',
+        userEmail: userStore.value?.user.username ?? '',
+        userName: userStore.value?.user.name ?? '',
+        notes: payload.notes ?? '',
         date: new Date(),
-        log: pendingLog.value,
-      };
+        log: pendingLog.value
+      }
       // Only run if the change has not already been logged
       if (!changeLogged) {
-        changeStore.addChange(changeObj);
+        changeStore.addChange(changeObj)
       }
       // If the original status being decline is from the offered list, remove the Accept - School label
-      if (payload.lotteryList === "Offered List" && list === "Forfeited") {
-        deleteLabel(payload, "Accept");
-      } else if (
-        payload.lotteryList === "Waiting List" &&
-        list === "Forfeited"
-      ) {
+      if (payload.lotteryList === 'Offered List' && list === 'Forfeited') {
+        deleteLabel(payload, 'Accept')
+      } else if (payload.lotteryList === 'Waiting List' && list === 'Forfeited') {
         // Remove the original Waitlist - School label if it exists
-        deleteLabel(payload, "Waitlist");
-      } else if (
-        payload.lotteryList === "Forefeited" &&
-        list === "Waiting List"
-      ) {
-        addLabel(payload, "Waitlist");
+        deleteLabel(payload, 'Waitlist')
+        // Also check if this forfeiture is from the Offer Pending list, then delete the Offer Pending label
+        if (payload.queueStatus === 'Offer Pending') {
+          deleteLabel(payload, 'Offer Pending')
+        }
+      } else if (payload.lotteryList === 'Forefeited' && list === 'Waiting List') {
+        addLabel(payload, 'Waitlist')
       }
       // Update the Pinia store for the result being changed to "Decline"
       const updateObj = resultStore.results.find(
         (item: Result) => item._id === payload._id
-      );
+      )
       if (!updateObj) {
-        console.log("No matching result found");
-        return;
+        console.log('No matching result found')
+        return
       }
-      updateObj.lotteryList = list;
-      updateObj.queueStatus = null;
+      updateObj.lotteryList = list
+      updateObj.queueStatus = null
 
       const pendingOffer = resultStore.pendingOffers.find(
         (item: Result) => item._id === payload._id
-      );
+      )
 
-      if (list === "Forfeited") {
-        updateObj.adjustedRank = null;
+      if (list === 'Forfeited') {
+        updateObj.adjustedRank = null
         // Send the decline information to update
         resultStore.updateResult({
           ...updateObj,
           update: {
             lotteryList: list,
             adjustedRank: null,
-            queueStatus: null,
-          },
-        });
+            queueStatus: null
+          }
+        })
         if (!pendingOffer) {
-          console.log(`Pending offer with id ${payload._id} not found`);
+          console.log(`Pending offer with id ${payload._id} not found`)
         } else if (pendingOffer) {
-          pendingOffer.lotteryList = list;
-          pendingOffer.adjustedRank = null;
-          pendingOffer.queueStatus = null;
-          resultStore.pendingOffers = [...resultStore.pendingOffers];
+          pendingOffer.lotteryList = list
+          pendingOffer.adjustedRank = null
+          pendingOffer.queueStatus = null
+          resultStore.pendingOffers = [...resultStore.pendingOffers]
         }
       } else {
-        updateObj.adjustedRank = maxRank + 1;
+        updateObj.adjustedRank = maxRank + 1
         // Send the decline information to update
         resultStore.updateResult({
           ...updateObj,
           update: {
             lotteryList: list,
             adjustedRank: maxRank + 1,
-            queueStatus: null,
-          },
-        });
+            queueStatus: null
+          }
+        })
         if (!pendingOffer) {
-          console.log(`Pending offer with id ${payload._id} not found`);
+          console.log(`Pending offer with id ${payload._id} not found`)
         } else if (pendingOffer) {
-          pendingOffer.lotteryList = list;
-          pendingOffer.adjustedRank = maxRank + 1;
-          pendingOffer.queueStatus = null;
-          resultStore.pendingOffers = [...resultStore.pendingOffers];
+          pendingOffer.lotteryList = list
+          pendingOffer.adjustedRank = maxRank + 1
+          pendingOffer.queueStatus = null
+          resultStore.pendingOffers = [...resultStore.pendingOffers]
         }
       }
       // This was added to fix the shallowRef limitation of TanStack table data reactivity
-      resultStore.results = [...resultStore.results];
+      resultStore.results = [...resultStore.results]
       toast.add({
-        title: "Successfully moved student",
-        description: `Changed ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade} from '${payload.lotteryList}' to '${list}'`,
-      });
+        title: 'Successfully moved student',
+        description: `Changed ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade} from '${payload.lotteryList}' to '${list}'`
+      })
       setTimeout(() => {
-        showModal.value = false;
-        //selectedResult.value = {};
-      }, 1000);
+        showModal.value = false
+        // selectedResult.value = {};
+      }, 1000)
     }
-  };
+  }
 
   const runAcceptOffer = (payload: Result) => {
     // This will mark the pending status and continue to similate the changes
-    if (payload.stage === "Check") {
-      console.log("Running accept offer check function");
-      pendingStatus.value = true;
-      buttonText.value = "Submit Changes";
+    if (payload.stage === 'Check') {
+      console.log('Running accept offer check function')
+      pendingStatus.value = true
+      buttonText.value = 'Submit Changes'
       pendingChanges.value.push(
         `Change ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade} from '${payload.lotteryList}' to 'Offered List'`
-      );
-      pendingIds.value.push(payload._id);
+      )
+      pendingIds.value.push(payload._id)
       pendingLog.value.push({
         submissionId: payload.submissionId,
-        change: `Change ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade} from '${payload.lotteryList}' to 'Offered List'`,
-      });
+        change: `Change ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade} from '${payload.lotteryList}' to 'Offered List'`
+      })
     }
     // Will run everytime to simulate the changes and/or make the changes
-    adjustRankings(payload);
+    adjustRankings(payload)
     // Check lower results from applicant
     const lowerResults = resultStore.results.filter(
       (item: Result) =>
         item.submissionId === payload.submissionId &&
         item.ChoiceRank > payload.ChoiceRank
-    );
+    )
     // Use the getMaxRank util function to get the maxRank of the Offered List
     const maxRank = getMaxRank(
       payload.SchoolID,
       payload.Grade,
       resultStore.results,
-      "Offered List"
-    );
+      'Offered List'
+    )
     // Run the decline offer for the other lower ranked Results
     lowerResults.forEach((item: Result) => {
-      let temp = {
+      const temp = {
         ...item,
         stage: payload.stage,
-        action: "Decline lower ranked choices",
-      };
-      moveToList(temp, "Forfeited", changeLogged.value);
-    });
+        action: 'Decline lower ranked choices'
+      }
+      moveToList(temp, 'Forfeited', changeLogged.value)
+    })
     // After the initial test calculations, mark the change as logged so only it only logs once
-    changeLogged.value = true;
+    changeLogged.value = true
     // Once changes have been similated/pending, actually make the changes
-    if (payload.stage === "Submit Changes") {
+    if (payload.stage === 'Submit Changes') {
       // Disable the button to prevent double clicking
-      buttonDisabled.value = true;
-      console.log("Running accept offer submit function");
+      buttonDisabled.value = true
+      console.log('Running accept offer submit function')
       // add the pending changes to the history log
       const changeObj: Change = {
         changes: pendingChanges.value,
         ids: pendingIds.value,
-        userId: userStore.value?.user.localAccountId ?? "",
-        userEmail: userStore.value?.user.username ?? "",
-        userName: userStore.value?.user.name ?? "",
-        notes: payload.notes ?? "",
+        userId: userStore.value?.user.localAccountId ?? '',
+        userEmail: userStore.value?.user.username ?? '',
+        userName: userStore.value?.user.name ?? '',
+        notes: payload.notes ?? '',
         date: new Date(),
-        log: pendingLog.value,
-      };
-      changeStore.addChange(changeObj);
+        log: pendingLog.value
+      }
+      changeStore.addChange(changeObj)
       // Update the Pinia store for the result being changed to "Offered List"
       const acceptObj = resultStore.results.find(
         (item: Result) => item._id === payload._id
-      );
+      )
       if (!acceptObj) {
-        throw new Error(`Result with id ${payload._id} not found`);
+        throw new Error(`Result with id ${payload._id} not found`)
       }
       const pendingOffer = resultStore.pendingOffers.find(
         (item: Result) => item._id === payload._id
-      );
+      )
 
-      acceptObj.lotteryList = "Offered List";
-      acceptObj.adjustedRank = maxRank + 1;
-      acceptObj.queueStatus = null;
-      resultStore.results = [...resultStore.results];
+      acceptObj.lotteryList = 'Offered List'
+      acceptObj.adjustedRank = maxRank + 1
+      acceptObj.queueStatus = null
+      resultStore.results = [...resultStore.results]
       if (!pendingOffer) {
-        console.log(`Pending offer with id ${payload._id} not found`);
+        console.log(`Pending offer with id ${payload._id} not found`)
       } else if (pendingOffer) {
-        pendingOffer.lotteryList = "Offered List";
-        pendingOffer.adjustedRank = maxRank + 1;
-        pendingOffer.queueStatus = null;
-        resultStore.pendingOffers = [...resultStore.pendingOffers];
+        pendingOffer.lotteryList = 'Offered List'
+        pendingOffer.adjustedRank = maxRank + 1
+        pendingOffer.queueStatus = null
+        resultStore.pendingOffers = [...resultStore.pendingOffers]
       }
       // Add the Accept - School label
-      addLabel(payload, "Accept");
+      addLabel(payload, 'Accept')
+      // Remove the OP - School label
+      deleteLabel(payload, 'Offer Pending')
       // Remove the Waitlist - School label
-      deleteLabel(payload, "Waitlist");
+      deleteLabel(payload, 'Waitlist')
       // Send the offer information to update
       resultStore.updateResult({
         ...payload,
         update: {
-          lotteryList: "Offered List",
+          lotteryList: 'Offered List',
           adjustedRank: maxRank + 1,
-          queueStatus: null,
-        },
-      });
+          queueStatus: null
+        }
+      })
       toast.add({
-        title: "Successfully accepted offer",
-        description: `Changed ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade} from '${payload.lotteryList}' to 'Offered List'`,
-      });
+        title: 'Successfully accepted offer',
+        description: `Changed ${payload.FirstName} ${payload.LastName} at ${payload.School}, grade ${payload.Grade} from '${payload.lotteryList}' to 'Offered List'`
+      })
 
       setTimeout(() => {
-        showModal.value = false;
-      }, 1000);
+        showModal.value = false
+      }, 1000)
     }
-  };
+  }
 
   const runAction = (payload: Result) => {
-    console.log("event: ", event);
-    if (payload.action === "Remove") {
-      moveToList(payload, "Forfeited", false);
-    } else if (payload.action === "Add Wait") {
-      moveToList(payload, "Waiting List", false);
-    } else if (payload.action === "Add Offer") {
-      runAcceptOffer(payload);
-    } else if (payload.action === "Secondary") {
-      moveToList(payload, "Secondary Waitlist", false);
-    } else if (payload.action === "Enroll") {
-      confirmEnrollment(payload);
-    } else if (payload.action === "Accept") {
-      runAcceptOffer(payload);
-    } else if (payload.action === "Decline") {
-      moveToList(payload, "Forfeited", false);
-    } else if (payload.action === "Test Action") {
-      console.log("Test Action: ", payload);
-      console.log("userStore user: ", userStore.value.user);
-      buttonText.value = "Checking...";
+    console.log('event: ', event)
+    if (payload.action === 'Remove') {
+      moveToList(payload, 'Forfeited', false)
+    } else if (payload.action === 'Add Wait') {
+      moveToList(payload, 'Waiting List', false)
+    } else if (payload.action === 'Add Offer') {
+      runAcceptOffer(payload)
+    } else if (payload.action === 'Secondary') {
+      moveToList(payload, 'Secondary Waitlist', false)
+    } else if (payload.action === 'Enroll') {
+      confirmEnrollment(payload)
+    } else if (payload.action === 'Accept') {
+      runAcceptOffer(payload)
+    } else if (payload.action === 'Decline') {
+      moveToList(payload, 'Forfeited', false)
+    } else if (payload.action === 'Test Action') {
+      console.log('Test Action: ', payload)
+      console.log('userStore user: ', userStore.value.user)
+      buttonText.value = 'Checking...'
       toast.add({
-        title: "Test Action from Composable",
-        description: "This is a test action toast running from composable.",
-      });
+        title: 'Test Action from Composable',
+        description: 'This is a test action toast running from composable.'
+      })
     } else {
-      //if (user.value) {
+      // if (user.value) {
       //  console.log(user.value.id, user.value.email);
-      //} else {
+      // } else {
       //  console.log("User is not logged in");
-      //}
-      console.log("runAction:", payload.action);
+      // }
+      console.log('runAction:', payload.action)
     }
-  };
+  }
 
   return {
     // All we need to use is the runAction function which then
@@ -676,6 +608,6 @@ export default function () {
     pendingIds,
     pendingLog,
     pendingStatus,
-    showModal,
-  };
+    showModal
+  }
 }

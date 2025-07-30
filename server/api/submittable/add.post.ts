@@ -31,6 +31,16 @@ export default defineEventHandler(async (event) => {
       3639: "676c58a4-f879-4ab5-8589-b0dda2be8f2b", // Waitlist - Edmonson
       7326: "afd1a207-6448-4c0e-8d00-e69e007b9ce1", // Waitlist - FLICS
     };
+    // Offer Pending UUIDs
+    const offerPendingIds: Record<number, string> = {
+      7326: "59bb5f00-858c-483b-beea-9d7ae737aecc", // FLICS OP
+      2882: "d51db97c-5612-4621-a198-a003a99ba542", // Bates OP
+      689: "71e67c62-9009-4bb3-9cba-6f4feff7a2b8", // Chrylser OP
+      1552: "ab8fefc8-8835-45c0-b405-e9797221588d", // Palmer OP
+      1084: "7afe9ba7-f97d-413a-ae7c-109fd17b3bcb", // Edison OP
+      3639: "40a6ce9a-1103-4b46-9bd5-e5382a5b9dff", // Edmonson OP
+      3638: "2aa89d69-dca9-4014-aa3b-ad4f10a45308", // TSM OP
+    };
     // These are the stage UUIDs that are unique to the Project and will need to be updated every year
     // UPDATE ANNUALLY
     const stagePK: Record<number, string> = {
@@ -65,6 +75,8 @@ export default defineEventHandler(async (event) => {
       // Assign a labelId based on the school
       if (body.type === "Accept") {
         return acceptIds[body.SchoolID];
+      } else if (body.type === "Offer Pending") {
+        return offerPendingIds[body.SchoolID];
       } else if (body.type === "Waitlist") {
         return waitIds[body.SchoolID];
       } else if (body.type === "Update") {
@@ -86,7 +98,6 @@ export default defineEventHandler(async (event) => {
         },
       }
     );
-
 
     if (body.type == "Accept") {
       // Add the updated placement label to any that get a new accept placement
