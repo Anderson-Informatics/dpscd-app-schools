@@ -3,70 +3,75 @@ defineProps<{
   collapsed?: boolean
 }>()
 
-const teams = ref([{
-  label: 'DPSCD',
-  avatar: {
-    src: 'https://www.detroitk12.org/cms/lib/MI50000060/Centricity/template/globalassets/images/favicons/dpscd-favicon.ico',
-    alt: 'DPSCD'
-  }
-},
-{
-  label: '2024 Apps (In-Progress)',
-  avatar: {
-    src: 'https://www.detroitk12.org/cms/lib/MI50000060/Centricity/template/globalassets/images/favicons/dpscd-favicon.ico',
-    alt: '2024 Apps (In-Progress)'
-  }
-},
-  /*
-  {
-    label: 'Nuxt',
-    avatar: {
-      src: 'https://github.com/nuxt.png',
-      alt: 'Nuxt'
-    }
-  }, {
-    label: 'NuxtHub',
-    avatar: {
-      src: 'https://github.com/nuxt-hub.png',
-      alt: 'NuxtHub'
-    }
-  }, {
-    label: 'NuxtLabs',
-    avatar: {
-      src: 'https://github.com/nuxtlabs.png',
-      alt: 'NuxtLabs'
-    }
-  }
-  */
-])
-const selectedTeam = ref(teams.value[0])
+const { teams, setYear, year } = useAppYear()
+
+const activeTeam = computed(() => {
+  const activeYear = String(year.value ?? '').trim()
+  return teams.find((team) => team.year === activeYear) ?? teams[0]
+})
+
+const activeTeamLabel = computed(() => activeTeam.value?.label ?? `${year.value} Apps`)
+const activeTeamAvatar = computed(() => activeTeam.value?.avatar)
+const activeYearShort = computed(() => String(year.value ?? '').slice(-2))
 
 const items = computed(() => {
-  return [teams.value.map(team => ({
-    ...team,
-    onSelect() {
-      selectedTeam.value = team
-    }
-  })), [{
-    label: 'Create team',
-    icon: 'i-lucide-circle-plus'
-  }, {
-    label: 'Manage teams',
-    icon: 'i-lucide-cog'
-  }]]
+  return [
+    teams.map((team) => ({
+      label: team.label,
+      avatar: team.avatar,
+      async onSelect() {
+        if (team.year !== year.value) {
+          setYear(team.year)
+          await refreshNuxtData()
+        }
+      }
+    })),
+    [
+      {
+        label: 'Create team',
+        icon: 'i-lucide-circle-plus'
+      },
+      {
+        label: 'Manage teams',
+        icon: 'i-lucide-cog'
+      }
+    ]
+  ]
 })
 </script>
 
 <template>
-  <UDropdownMenu :items="items" :content="{ align: 'center', collisionPadding: 12 }"
-    :ui="{ content: collapsed ? 'w-40' : 'w-(--reka-dropdown-menu-trigger-width)' }">
-    <UButton v-bind="{
-      ...selectedTeam,
-      label: collapsed ? undefined : selectedTeam?.label,
-      trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down'
-    }" color="neutral" variant="ghost" block :square="collapsed" class="data-[state=open]:bg-(--ui-bg-elevated)"
-      :class="[!collapsed && 'py-2']" :ui="{
-        trailingIcon: 'text-(--ui-text-dimmed)'
-      }" />
+  <UDropdownMenu
+    :key="`menu-${year}`"
+    :items="items"
+    :content="{ align: 'center', collisionPadding: 12 }"
+    :ui="{
+      content: collapsed ? 'w-40' : 'w-(--reka-dropdown-menu-trigger-width)'
+    }"
+  >
+    <div class="relative w-full">
+      <UButton
+        :key="`team-${year}`"
+        :label="collapsed ? undefined : activeTeamLabel"
+        :avatar="activeTeamAvatar"
+        color="neutral"
+        variant="ghost"
+        block
+        :square="collapsed"
+        :trailing-icon="collapsed ? undefined : 'i-lucide-chevrons-up-down'"
+        class="data-[state=open]:bg-(--ui-bg-elevated)"
+        :class="[!collapsed && 'py-2']"
+        :ui="{
+          trailingIcon: 'text-(--ui-text-dimmed)'
+        }"
+      />
+
+      <span
+        v-if="collapsed"
+        class="absolute right-1 top-1 rounded bg-(--ui-primary) px-1 text-[10px] font-semibold leading-4 text-(--ui-bg)"
+      >
+        {{ activeYearShort }}
+      </span>
+    </div>
   </UDropdownMenu>
 </template>

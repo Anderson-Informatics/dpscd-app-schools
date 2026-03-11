@@ -1,7 +1,9 @@
-import QualificationModel from "~~/server/models/qualification.model";
+import QualificationModel from '~~/server/models/qualification.model'
+import { getYearFromEvent, withYearFilter } from '~~/server/utils/year'
 
 export default defineEventHandler(async (event) => {
-  const qualifications = await QualificationModel.find();
+  const year = getYearFromEvent(event)
+  const qualifications = await QualificationModel.find(withYearFilter(year))
 
-  return qualifications;
-});
+  return qualifications
+})

@@ -1,32 +1,49 @@
 <script setup lang="ts">
-const links = [[{
-  label: 'General',
-  icon: 'i-lucide-user',
-  to: '/settings',
-  exact: true
-}, {
-  label: 'Members',
-  icon: 'i-lucide-users',
-  to: '/settings/members'
-}, {
-  label: 'Notifications',
-  icon: 'i-lucide-bell',
-  to: '/settings/notifications'
-}, {
-  label: 'Security',
-  icon: 'i-lucide-shield',
-  to: '/settings/security'
-}], [{
-  label: 'Documentation',
-  icon: 'i-lucide-book-open',
-  to: 'https://ui.nuxt.com/getting-started/installation/pro/nuxt',
-  target: '_blank'
-}, {
-  label: 'Buy now',
-  icon: 'i-lucide-shopping-cart',
-  to: 'https://ui.nuxt.com/pro/purchase',
-  target: '_blank'
-}]]
+const userStore = useAppUser()
+
+const links = [
+  [
+    {
+      label: 'General',
+      icon: 'i-lucide-user',
+      to: '/settings',
+      exact: true
+    },
+    ...(userStore.value.user.role === 'central office admin'
+      ? [
+          {
+            label: 'Team',
+            icon: 'i-lucide-users',
+            to: '/settings/members'
+          }
+        ]
+      : []),
+    {
+      label: 'Notifications',
+      icon: 'i-lucide-bell',
+      to: '/settings/notifications'
+    },
+    {
+      label: 'Security',
+      icon: 'i-lucide-shield',
+      to: '/settings/security'
+    }
+  ],
+  [
+    {
+      label: 'Documentation',
+      icon: 'i-lucide-book-open',
+      to: 'https://ui.nuxt.com/getting-started/installation/pro/nuxt',
+      target: '_blank'
+    },
+    {
+      label: 'Buy now',
+      icon: 'i-lucide-shopping-cart',
+      to: 'https://ui.nuxt.com/pro/purchase',
+      target: '_blank'
+    }
+  ]
+]
 </script>
 
 <template>
@@ -35,6 +52,9 @@ const links = [[{
       <UDashboardNavbar title="Settings">
         <template #leading>
           <UDashboardSidebarCollapse />
+        </template>
+        <template #right>
+          <ActiveYearBadge />
         </template>
       </UDashboardNavbar>
 
@@ -45,7 +65,7 @@ const links = [[{
     </template>
 
     <template #body>
-      <div class="flex flex-col gap-4 sm:gap-6 lg:gap-12 w-full lg:max-w-2xl mx-auto">
+      <div class="flex flex-col gap-4 sm:gap-6 lg:gap-12 w-full lg:max-w-4xl mx-auto">
         <NuxtPage />
       </div>
     </template>

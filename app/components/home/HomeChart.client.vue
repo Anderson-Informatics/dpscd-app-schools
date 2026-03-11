@@ -28,7 +28,7 @@ const { data } = await useAsyncData<DataRecord[]>(async () => {
   const min = 1000
   const max = 10000
 
-  return dates.map(date => ({ date, amount: Math.floor(Math.random() * (max - min + 1)) + min }))
+  return dates.map((date) => ({ date, amount: Math.floor(Math.random() * (max - min + 1)) + min }))
 }, {
   watch: [() => props.period, () => props.range],
   default: () => []

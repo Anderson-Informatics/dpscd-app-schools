@@ -1,139 +1,143 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose'
 
 const schema: mongoose.Schema = new mongoose.Schema({
   _id: {
     type: String,
-    required: true,
+    required: true
   },
   submissionId: {
     type: String,
-    required: true,
+    required: true
   },
   submissionStatus: {
     type: String,
-    required: true,
+    required: true
   },
   submitterFirstName: {
     type: String,
-    required: true,
+    required: true
   },
   submitterLastName: {
     type: String,
-    required: true,
+    required: true
   },
   submitterEmail: {
     type: String,
-    required: true,
+    required: true
   },
   submitterLastLoginDate: {
     type: Date,
-    required: true,
+    required: true
   },
   submissionDate: {
     type: Date,
-    required: true,
+    required: true
   },
   projectName: {
     type: String,
-    required: true,
+    required: true
   },
   FullName: {
     type: String,
-    required: true,
+    required: true
   },
   FirstName: {
     type: String,
-    required: true,
+    required: true
   },
   LastName: {
     type: String,
-    required: true,
+    required: true
   },
   ParentFirst: {
     type: String,
-    required: true,
+    required: true
   },
   ParentLast: {
     type: String,
-    required: true,
+    required: true
   },
   ParentPhone: {
     type: String,
-    required: true,
+    required: true
   },
   ParentEmail: {
     type: String,
-    required: true,
+    required: true
   },
   DOB: {
     type: Date,
-    required: true,
+    required: true
   },
   Address1: {
     type: String,
-    required: true,
+    required: true
   },
   Address2: {
     type: String,
-    required: false,
+    required: false
   },
   City: {
     type: String,
-    required: true,
+    required: true
   },
   State: {
     type: String,
-    required: true,
+    required: true
   },
   Zip: {
     type: String,
-    required: true,
+    required: true
   },
   Gender: {
     type: String,
-    required: true,
+    required: true
   },
   Grade: {
     type: String,
-    required: true,
+    required: true
   },
   FirstChoiceSchool: {
     type: String,
-    required: false,
+    required: false
   },
   SecondChoiceSchool: {
     type: String,
-    required: false,
+    required: false
   },
   ThirdChoiceSchool: {
     type: String,
-    required: false,
+    required: false
   },
   IEP: {
     type: String,
-    required: true,
+    required: true
   },
   AgeEligible: {
     type: String,
-    required: true,
+    required: true
   },
   MontMG: {
     type: Boolean,
-    required: true,
+    required: true
   },
   Exam: {
     type: Boolean,
-    required: true,
+    required: true
   },
   ExamRequired: {
     type: Boolean,
-    required: true,
+    required: true
   },
   History: {
     type: Array,
-    required: false,
+    required: false
   },
-});
+  year: {
+    type: String,
+    required: false
+  }
+})
 
 // submission model
-export default mongoose.model("Submission", schema);
+export default mongoose.model('Submission', schema)

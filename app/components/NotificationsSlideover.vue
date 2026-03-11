@@ -3,8 +3,14 @@ import { formatTimeAgo } from '@vueuse/core'
 import type { Notification } from '~/types'
 
 const { isNotificationsSlideoverOpen } = useDashboard()
+const { withYearQuery } = useAppYear()
 
-const { data: notifications } = await useFetch<Notification[]>('/api/notifications')
+const { data: notifications } = await useFetch<Notification[]>(
+  '/api/notifications',
+  {
+    query: withYearQuery()
+  }
+)
 </script>
 
 <template>
@@ -33,7 +39,9 @@ const { data: notifications } = await useFetch<Notification[]>('/api/notificatio
 
         <div class="text-sm flex-1">
           <p class="flex items-center justify-between">
-            <span class="text-(--ui-text-highlighted) font-medium">{{ notification.sender.name }}</span>
+            <span class="text-(--ui-text-highlighted) font-medium">{{
+              notification.sender.name
+            }}</span>
 
             <time
               :datetime="notification.date"
