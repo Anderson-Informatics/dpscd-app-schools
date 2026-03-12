@@ -1,20 +1,9 @@
-import User from '../models/user.model'
+import User from '../../models/user.model'
 
 export default defineEventHandler(async (_event) => {
   try {
     const users = await User.find()
-
-    return users.map((user) => ({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      school: user.school,
-      avatar: {
-        src: undefined,
-        alt: user.name
-      }
-    }))
+    return users
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     throw createError({

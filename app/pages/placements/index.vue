@@ -2,22 +2,22 @@
 <!-- eslint-disable vue/first-attribute-linebreak -->
 <!-- eslint-disable vue/first-attribute-linebreak -->
 <script setup lang="ts">
-import type { TableColumn } from '@nuxt/ui'
+import * as z from 'zod'
+// import { roundToNearestHours } from 'date-fns'
 import { upperFirst } from 'scule'
 import { getPaginationRowModel, type Row } from '@tanstack/table-core'
+import type { TableColumn } from '@nuxt/ui'
 import type { User } from '~/types'
 import type { Result } from '~~/types/result'
-import * as z from 'zod'
-import type { FormSubmitEvent } from '@nuxt/ui'
-import { roundToNearestHours } from 'date-fns'
+// import type { FormSubmitEvent } from '@nuxt/ui'
 
 const schema = z.object({
-  notes: z.string(),
+  notes: z.string()
 })
 type Schema = z.output<typeof schema>
 
 const state = reactive<Partial<Schema>>({
-  notes: '',
+  notes: ''
 })
 
 // Load all of the key placement change functions/refs from composable
@@ -25,16 +25,18 @@ const actions = useActions()
 
 const UButton = resolveComponent('UButton')
 const UDropdownMenu = resolveComponent('UDropdownMenu')
-const UCheckbox = resolveComponent('UCheckbox')
+// const UCheckbox = resolveComponent('UCheckbox')
 
 const toast = useToast()
 const table = useTemplateRef('table')
-
+const { withYearQuery } = useAppYear()
+const userStore = useAppUser()
+const isSchoolAdmin = computed(() => userStore.value.user.role === 'school admin')
 
 // Get the results and schools data from the Pinia store
 const resultStore = useResultStore()
 await useAsyncData('results', () => resultStore.getAll(), {})
-await useAsyncData('pendingOffers', () => resultStore.getPending(), {});
+await useAsyncData('pendingOffers', () => resultStore.getPending(), {})
 await useAsyncData('schools', () => resultStore.getSchools(), {})
 const changeStore = useChangeStore()
 await useAsyncData('changes', () => changeStore.getAll(), {})
@@ -48,63 +50,120 @@ const listFilter = ref('all')
 const gradeFilter = ref('all')
 const enrollFilter = ref<string | boolean | null>('all')
 
-watch(() => schoolFilter.value, (newVal) => {
-  if (!table?.value?.tableApi) return
+watch(
+  () => schoolFilter.value,
+  (newVal) => {
+    if (!table?.value?.tableApi) return
 
-  const schoolColumn = table.value.tableApi.getColumn('School')
-  if (!schoolColumn) return
+    const schoolColumn = table.value.tableApi.getColumn('School')
+    if (!schoolColumn) return
 
-  if (newVal === 'all') {
-    schoolColumn.setFilterValue(undefined)
-  } else {
-    schoolColumn.setFilterValue(newVal)
+    if (newVal === 'all') {
+      schoolColumn.setFilterValue(undefined)
+    } else {
+      schoolColumn.setFilterValue(newVal)
+    }
   }
-})
+)
 
-watch(() => listFilter.value, (newVal) => {
-  if (!table?.value?.tableApi) return
+watch(
+  () => listFilter.value,
+  (newVal) => {
+    if (!table?.value?.tableApi) return
 
-  const listColumn = table.value.tableApi.getColumn('lotteryList')
-  if (!listColumn) return
+    const listColumn = table.value.tableApi.getColumn('lotteryList')
+    if (!listColumn) return
 
-  if (newVal === 'all') {
-    listColumn.setFilterValue(undefined)
-  } else {
-    listColumn.setFilterValue(newVal)
+    if (newVal === 'all') {
+      listColumn.setFilterValue(undefined)
+    } else {
+      listColumn.setFilterValue(newVal)
+    }
   }
-})
+)
 
-watch(() => gradeFilter.value, (newVal) => {
-  if (!table?.value?.tableApi) return
+watch(
+  () => gradeFilter.value,
+  (newVal) => {
+    if (!table?.value?.tableApi) return
 
-  const gradeColumn = table.value.tableApi.getColumn('Grade')
-  if (!gradeColumn) return
+    const gradeColumn = table.value.tableApi.getColumn('Grade')
+    if (!gradeColumn) return
 
-  if (newVal === 'all') {
-    gradeColumn.setFilterValue(undefined)
-  } else {
-    gradeColumn.setFilterValue(newVal)
+    if (newVal === 'all') {
+      gradeColumn.setFilterValue(undefined)
+    } else {
+      gradeColumn.setFilterValue(newVal)
+    }
   }
-})
+)
 
-watch(() => enrollFilter.value, (newVal) => {
-  if (!table?.value?.tableApi) return
+watch(
+  () => enrollFilter.value,
+  (newVal) => {
+    if (!table?.value?.tableApi) return
 
-  const enrollColumn = table.value.tableApi.getColumn('confirmedEnrollment')
-  if (!enrollColumn) return
+    const enrollColumn = table.value.tableApi.getColumn('confirmedEnrollment')
+    if (!enrollColumn) return
 
-  if (newVal === 'all') {
-    enrollColumn.setFilterValue(undefined)
-  } else {
-    enrollColumn.setFilterValue(newVal)
+    if (newVal === 'all') {
+      enrollColumn.setFilterValue(undefined)
+    } else {
+      enrollColumn.setFilterValue(newVal)
+    }
   }
-})
+)
 
 const { status } = await useFetch<User[]>('/api/customers', {
+  query: withYearQuery(),
   lazy: true
 })
 
 function getRowItems(row: Row<Result>) {
+  if (isSchoolAdmin.value) {
+    return [
+      {
+        type: 'label',
+        label: 'Actions'
+      },
+      {
+        label: 'View applicant/submission details',
+        icon: 'i-lucide-list',
+        onSelect() {
+          navigateTo('submissions/' + row.original.submissionId)
+        }
+      },
+      {
+        label: 'View on Submittable',
+        icon: 'i-lucide-external-link',
+        onSelect() {
+          navigateTo('https://dpscd.submittable.com/submissions/' + row.original.submissionId, {
+            external: true,
+            open: {
+              target: '_blank'
+            }
+          })
+        }
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Confirm Enrollment Status',
+        icon: 'i-lucide-folder-check',
+        color: 'primary',
+        onSelect() {
+          loadItem({
+            ...row.original,
+            action: 'Enroll',
+            actionLong: 'Confirm Enrollment Status',
+            stage: actions.buttonText.value
+          })
+        }
+      }
+    ]
+  }
+
   return [
     {
       type: 'label',
@@ -148,7 +207,12 @@ function getRowItems(row: Row<Result>) {
       icon: 'i-lucide-play',
       color: 'default',
       onSelect() {
-        loadItem({ ...row.original, action: 'Test Action', actionLong: 'Run Test Action', stage: actions.buttonText.value })
+        loadItem({
+          ...row.original,
+          action: 'Test Action',
+          actionLong: 'Run Test Action',
+          stage: actions.buttonText.value
+        })
       }
     },
     {
@@ -156,7 +220,12 @@ function getRowItems(row: Row<Result>) {
       icon: 'i-lucide-list-minus',
       color: 'error',
       onSelect() {
-        loadItem({ ...row.original, action: 'Remove', actionLong: 'Remove from Offer/Waiting List', stage: actions.buttonText.value })
+        loadItem({
+          ...row.original,
+          action: 'Remove',
+          actionLong: 'Remove from Offer/Waiting List',
+          stage: actions.buttonText.value
+        })
       }
     },
     {
@@ -164,7 +233,12 @@ function getRowItems(row: Row<Result>) {
       icon: 'i-lucide-list-plus',
       color: 'info',
       onSelect() {
-        loadItem({ ...row.original, action: 'Add Wait', actionLong: 'Add to Waiting List', stage: actions.buttonText.value })
+        loadItem({
+          ...row.original,
+          action: 'Add Wait',
+          actionLong: 'Add to Waiting List',
+          stage: actions.buttonText.value
+        })
       }
     },
     {
@@ -172,7 +246,12 @@ function getRowItems(row: Row<Result>) {
       icon: 'i-lucide-list-end',
       color: 'warning',
       onSelect() {
-        loadItem({ ...row.original, action: 'Secondary', actionLong: 'Move to Secondary Waitlist', stage: actions.buttonText.value })
+        loadItem({
+          ...row.original,
+          action: 'Secondary',
+          actionLong: 'Move to Secondary Waitlist',
+          stage: actions.buttonText.value
+        })
       }
     },
     {
@@ -180,7 +259,12 @@ function getRowItems(row: Row<Result>) {
       icon: 'i-lucide-list-plus',
       color: 'success',
       onSelect() {
-        loadItem({ ...row.original, action: 'Add Offer', actionLong: 'Add to Offered List', stage: actions.buttonText.value })
+        loadItem({
+          ...row.original,
+          action: 'Add Offer',
+          actionLong: 'Add to Offered List',
+          stage: actions.buttonText.value
+        })
       }
     },
     {
@@ -188,9 +272,14 @@ function getRowItems(row: Row<Result>) {
       icon: 'i-lucide-folder-check',
       color: 'primary',
       onSelect() {
-        loadItem({ ...row.original, action: 'Enroll', actionLong: 'Confirm Enrollment Status', stage: actions.buttonText.value })
+        loadItem({
+          ...row.original,
+          action: 'Enroll',
+          actionLong: 'Confirm Enrollment Status',
+          stage: actions.buttonText.value
+        })
       }
-    },
+    }
     /*
     {
       type: 'separator'
@@ -365,7 +454,16 @@ const columns: TableColumn<Result>[] = [
       const status = cell.getValue() as string
       return h(UButton, {
         label: status,
-        color: status === 'Offered List' ? 'success' : status === 'Waiting List' ? 'info' : status === 'Secondary Waitlist' ? 'warning' : status === 'Forfeited' ? 'error' : 'neutral',
+        color:
+          status === 'Offered List'
+            ? 'success'
+            : status === 'Waiting List'
+              ? 'info'
+              : status === 'Secondary Waitlist'
+                ? 'warning'
+                : status === 'Forfeited'
+                  ? 'error'
+                  : 'neutral',
         variant: 'subtle'
       })
     }
@@ -480,6 +578,9 @@ const loadItem = (val: Result) => {
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
+        <template #right>
+          <ActiveYearBadge />
+        </template>
         <!--
         <template #right>
           <CustomersAddModal />
@@ -490,25 +591,32 @@ const loadItem = (val: Result) => {
 
     <template #body>
       <div class="flex flex-wrap items-center justify-between gap-1.5">
-        <UModal v-model:open="actions.showModal.value" title="Placement Update Form"
-          description="Verify and log changes to placements" :ui="{ footer: 'justify-end' }">
+        <UModal
+          v-model:open="actions.showModal.value"
+          title="Placement Update Form"
+          description="Verify and log changes to placements"
+          :ui="{ footer: 'justify-end' }"
+        >
           <!--
           <UButton label="Open" color="neutral" variant="subtle" />
           -->
 
           <template #body>
             <UForm :schema="schema" :state="state">
-              Perform the "{{ formValues.actionLong }}" action for {{ formValues.FirstName }} {{ formValues.LastName }}
-              at {{
-              formValues.School }} for the {{ formValues.Grade }} grade.<br /><br />
+              Perform the "{{ formValues.actionLong }}" action for {{ formValues.FirstName }}
+              {{ formValues.LastName }} at {{ formValues.School }} for the
+              {{ formValues.Grade }} grade.<br /><br />
               <UFormField label="Notes" name="notes">
-                <UTextarea v-model="formValues.notes" placeholder="Add your notes/reasoning for changes..."
-                  class="w-full" />
+                <UTextarea
+                  v-model="formValues.notes"
+                  placeholder="Add your notes/reasoning for changes..."
+                  class="w-full"
+                />
               </UFormField>
               <div v-if="actions.pendingChanges.value.length > 0">
                 <p class="mt-6 text-lg">Pending changes:</p>
                 <ol class="text-left list-decimal list-inside mt-2 mb-4">
-                  <li v-for="(change, index) in actions.pendingChanges.value" class="mb-2">
+                  <li v-for="change in actions.pendingChanges.value" :key="change" class="mb-2">
                     {{ change }}
                   </li>
                 </ol>
@@ -517,10 +625,25 @@ const loadItem = (val: Result) => {
           </template>
 
           <template #footer>
-            <UButton label="Cancel" color="neutral" variant="outline"
-              @click="actions.showModal.value = false; actions.buttonText.value = 'Check'" />
-            <UButton :label="actions.buttonText.value" :disabled="actions.buttonDisabled.value" color="neutral"
-              @click="actions.runAction({ ...formValues, stage: actions.buttonText.value })" />
+            <UButton
+              label="Cancel"
+              color="neutral"
+              variant="outline"
+              @click="((actions.showModal.value = false), (actions.buttonText.value = 'Check'))"
+            />
+            <UButton
+              :label="actions.buttonText.value"
+              :disabled="actions.buttonDisabled.value"
+              color="neutral"
+              @click="
+                isSchoolAdmin && formValues.action !== 'Enroll'
+                  ? undefined
+                  : actions.runAction({
+                      ...formValues,
+                      stage: actions.buttonText.value
+                    })
+              "
+            />
           </template>
         </UModal>
         <!--
@@ -530,11 +653,15 @@ const loadItem = (val: Result) => {
         -->
         <UInput v-model="globalFilter" class="max-w-sm" placeholder="Filter..." />
 
-
         <div class="flex flex-wrap items-center gap-1.5">
           <CustomersDeleteModal :count="table?.tableApi?.getFilteredSelectedRowModel().rows.length">
-            <UButton v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Delete" color="error"
-              variant="subtle" icon="i-lucide-trash">
+            <UButton
+              v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length"
+              label="Delete"
+              color="error"
+              variant="subtle"
+              icon="i-lucide-trash"
+            >
               <template #trailing>
                 <UKbd>
                   {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}
@@ -543,97 +670,162 @@ const loadItem = (val: Result) => {
             </UButton>
           </CustomersDeleteModal>
 
-          <USelect v-model="schoolFilter" :items="[
-            { label: 'All Schools', value: 'all' },
-            { label: 'Bates', value: 'Bates Academy' },
-            { label: 'Chrysler', value: 'Chrysler Elementary' },
-            { label: 'Edison', value: 'Edison Elementary' },
-            { label: 'Edmonson', value: 'Edmonson Elementary' },
-            { label: 'FLICS', value: 'Foreign Language Immersion and Cultural Studies School' },
-            { label: 'Marygrove', value: 'The School at Marygrove' },
-            { label: 'Palmer Park', value: 'Palmer Park Preparatory Academy' }
-          ]" :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
-            placeholder="Filter school" class="min-w-28" />
-          <USelect v-model="listFilter" :items="[
-            { label: 'All Lists', value: 'all' },
-            { label: 'Offered', value: 'Offered List' },
-            { label: 'Waiting List', value: 'Waiting List' },
-            { label: 'Forfeited', value: 'Forfeited' },
-            { label: 'Secondary WL', value: 'Secondary Waitlist' }
-          ]" :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
-            placeholder="Filter list" class="min-w-28" />
-          <USelect v-model="gradeFilter" :items="[
-            { label: 'All Grades', value: 'all' },
-            { label: 'PreK', value: 'Pre-K' },
-            { label: 'K', value: 'Kindergarten' },
-            { label: '1', value: '1' },
-            { label: '2', value: '2' },
-            { label: '3', value: '3' },
-            { label: '4', value: '4' },
-            { label: '5', value: '5' },
-            { label: '6', value: '6' },
-            { label: '7', value: '7' },
-            { label: '8', value: '8' }
-          ]" :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
-            placeholder="Filter grade" class="min-w-28" />
-          <USelect v-model="enrollFilter" :items="[
-            { label: 'All Enrollment', value: 'all' },
-            { label: 'Enrolled', value: true },
-            { label: 'Not Enrolled', value: false },
-            { label: 'Unknown', value: null }
-          ]" :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
-            placeholder="Filter enrollment" class="min-w-28" />
-          <UButton type="button" @click="console.log(schoolFilter, listFilter, gradeFilter)" icon="i-lucide-folder-down"
-            class="bg-primary-500 hover:bg-primary-600 text-white font-bold">
-            <DownloadExcel :data="table?.tableApi?.getFilteredRowModel().rows.map((row) => row.original)" type="xlsx"
+          <USelect
+            v-model="schoolFilter"
+            :items="[
+              { label: 'All Schools', value: 'all' },
+              { label: 'Bates', value: 'Bates Academy' },
+              { label: 'Chrysler', value: 'Chrysler Elementary' },
+              { label: 'Edison', value: 'Edison Elementary' },
+              { label: 'Edmonson', value: 'Edmonson Elementary' },
+              {
+                label: 'FLICS',
+                value: 'Foreign Language Immersion and Cultural Studies School'
+              },
+              { label: 'Marygrove', value: 'The School at Marygrove' },
+              { label: 'Palmer Park', value: 'Palmer Park Preparatory Academy' }
+            ]"
+            :ui="{
+              trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200'
+            }"
+            placeholder="Filter school"
+            class="min-w-28"
+          />
+          <USelect
+            v-model="listFilter"
+            :items="[
+              { label: 'All Lists', value: 'all' },
+              { label: 'Offered', value: 'Offered List' },
+              { label: 'Waiting List', value: 'Waiting List' },
+              { label: 'Forfeited', value: 'Forfeited' },
+              { label: 'Secondary WL', value: 'Secondary Waitlist' }
+            ]"
+            :ui="{
+              trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200'
+            }"
+            placeholder="Filter list"
+            class="min-w-28"
+          />
+          <USelect
+            v-model="gradeFilter"
+            :items="[
+              { label: 'All Grades', value: 'all' },
+              { label: 'PreK', value: 'Pre-K' },
+              { label: 'K', value: 'Kindergarten' },
+              { label: '1', value: '1' },
+              { label: '2', value: '2' },
+              { label: '3', value: '3' },
+              { label: '4', value: '4' },
+              { label: '5', value: '5' },
+              { label: '6', value: '6' },
+              { label: '7', value: '7' },
+              { label: '8', value: '8' }
+            ]"
+            :ui="{
+              trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200'
+            }"
+            placeholder="Filter grade"
+            class="min-w-28"
+          />
+          <USelect
+            v-model="enrollFilter"
+            :items="
+              [
+                { label: 'All Enrollment', value: 'all' },
+                { label: 'Enrolled', value: true },
+                { label: 'Not Enrolled', value: false },
+                { label: 'Unknown', value: null }
+              ] as any
+            "
+            :ui="{
+              trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200'
+            }"
+            placeholder="Filter enrollment"
+            class="min-w-28"
+          />
+          <UButton
+            type="button"
+            icon="i-lucide-folder-down"
+            class="bg-primary-500 hover:bg-primary-600 text-white font-bold"
+            @click="console.log(schoolFilter, listFilter, gradeFilter)"
+          >
+            <DownloadExcel
+              :data="table?.tableApi?.getFilteredRowModel().rows.map((row) => row.original)"
+              type="xlsx"
               worksheet="Placements"
-              :name="`Placements_${schoolFilter.replaceAll(' ', '')}_${listFilter.replaceAll(' ', '')}_${gradeFilter}.xlsx`">
+              :name="`Placements_${schoolFilter.replaceAll(' ', '')}_${listFilter.replaceAll(' ', '')}_${gradeFilter}.xlsx`"
+            >
               Export
             </DownloadExcel>
           </UButton>
-          <UDropdownMenu :items="table?.tableApi
-            ?.getAllColumns()
-            .filter((column) => column.getCanHide())
-            .map((column) => ({
-              label: upperFirst(column.id),
-              type: 'checkbox' as const,
-              checked: column.getIsVisible(),
-              onUpdateChecked(checked: boolean) {
-                table?.tableApi?.getColumn(column.id)?.toggleVisibility(!!checked)
-              },
-              onSelect(e?: Event) {
-                e?.preventDefault()
-              }
-            }))
-            " :content="{ align: 'end' }">
-            <UButton label="Display" color="neutral" variant="outline" trailing-icon="i-lucide-settings-2" />
+          <UDropdownMenu
+            :items="
+              table?.tableApi
+                ?.getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => ({
+                  label: upperFirst(column.id),
+                  type: 'checkbox' as const,
+                  checked: column.getIsVisible(),
+                  onUpdateChecked(checked: boolean) {
+                    table?.tableApi?.getColumn(column.id)?.toggleVisibility(!!checked)
+                  },
+                  onSelect(e?: Event) {
+                    e?.preventDefault()
+                  }
+                }))
+            "
+            :content="{ align: 'end' }"
+          >
+            <UButton
+              label="Display"
+              color="neutral"
+              variant="outline"
+              trailing-icon="i-lucide-settings-2"
+            />
           </UDropdownMenu>
         </div>
       </div>
 
-      <UTable ref="table" v-model:sorting="sorting" v-model:global-filter="globalFilter"
-        v-model:column-visibility="columnVisibility" v-model:row-selection="rowSelection"
-        v-model:pagination="pagination" :pagination-options="{
+      <UTable
+        ref="table"
+        v-model:sorting="sorting"
+        v-model:global-filter="globalFilter"
+        v-model:column-visibility="columnVisibility"
+        v-model:row-selection="rowSelection"
+        v-model:pagination="pagination"
+        :pagination-options="{
           getPaginationRowModel: getPaginationRowModel()
-        }" class="shrink-0" :data="resultStore.results" :columns="columns" :loading="status === 'pending'" :ui="{
+        }"
+        class="shrink-0"
+        :data="resultStore.results"
+        :columns="columns"
+        :loading="status === 'pending'"
+        :ui="{
           base: 'table-fixed border-separate border-spacing-0',
           thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
           tbody: '[&>tr]:last:[&>td]:border-b-0',
           th: 'py-1 first:rounded-l-[calc(var(--ui-radius)*2)] last:rounded-r-[calc(var(--ui-radius)*2)] border-y border-(--ui-border) first:border-l last:border-r',
           td: 'border-b border-(--ui-border)'
-        }" />
+        }"
+      />
 
-      <div class="flex items-center justify-between gap-3 border-t border-(--ui-border) pt-4 mt-auto">
+      <div
+        class="flex items-center justify-between gap-3 border-t border-(--ui-border) pt-4 mt-auto"
+      >
         <div class="text-sm text-(--ui-text-muted)">
-          {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0 }} of
+          {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0 }}
+          of
           {{ table?.tableApi?.getFilteredRowModel().rows.length || 0 }} row(s) selected.
         </div>
 
         <div class="flex items-center gap-1.5">
-          <UPagination :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
+          <UPagination
+            :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
             :items-per-page="table?.tableApi?.getState().pagination.pageSize"
             :total="table?.tableApi?.getFilteredRowModel().rows.length"
-            @update:page="(p) => table?.tableApi?.setPageIndex(p - 1)" />
+            @update:page="(p) => table?.tableApi?.setPageIndex(p - 1)"
+          />
         </div>
       </div>
     </template>

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose'
 
 const schema: mongoose.Schema = new mongoose.Schema({
   _id: String,
@@ -11,10 +11,11 @@ const schema: mongoose.Schema = new mongoose.Schema({
   log: [
     {
       submissionId: String,
-      change: String,
-    },
+      change: String
+    }
   ],
-});
+  year: String
+})
 
 // history model
-export default mongoose.model("Change", schema);
+export default mongoose.model('Change', schema)

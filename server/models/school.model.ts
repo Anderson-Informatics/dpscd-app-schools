@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose'
 
 const schema: mongoose.Schema = new mongoose.Schema({
   _id: String,
@@ -9,7 +9,8 @@ const schema: mongoose.Schema = new mongoose.Schema({
   Type: String,
   ShortName: String,
   Capacity: Object,
-});
+  year: String
+})
 
 // schools model
-export default mongoose.model("School", schema);
+export default mongoose.model('School', schema)

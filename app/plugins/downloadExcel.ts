@@ -1,5 +1,5 @@
-import JsonExcel from "vue-json-excel3";
+import JsonExcel from 'vue-json-excel3'
 
 export default defineNuxtPlugin((app) => {
-  app.vueApp.component("DownloadExcel", JsonExcel);
-});
+  app.vueApp.component('DownloadExcel', JsonExcel)
+})

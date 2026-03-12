@@ -1,45 +1,48 @@
 <script setup lang="ts">
-const route = useRoute()
-const toast = useToast()
-
 const open = ref(false)
 
-const links = [[{
-  label: 'Home',
-  icon: 'i-lucide-house',
-  to: '/',
-  onSelect: () => {
-    open.value = false
-  }
-}, {
-  label: 'Submissions',
-  icon: 'i-lucide-venetian-mask',
-  to: '/submissions',
-  onSelect: () => {
-    open.value = false
-  }
-}, {
-  label: 'Placements',
-  icon: 'i-lucide-file-check',
-  to: '/placements',
-  onSelect: () => {
-    open.value = false
-  }
-}, {
-  label: 'Offer Queue',
-  icon: 'i-lucide-phone-outgoing',
-  to: '/queue',
-  onSelect: () => {
-    open.value = false
-  }
-}, {
-  label: 'School Capacity',
-  icon: 'i-lucide-school',
-  to: '/capacity',
-  onSelect: () => {
-    open.value = false
-  }
-}, /*{
+const links = [
+  [
+    {
+      label: 'Home',
+      icon: 'i-lucide-house',
+      to: '/',
+      onSelect: () => {
+        open.value = false
+      }
+    },
+    {
+      label: 'Submissions',
+      icon: 'i-lucide-venetian-mask',
+      to: '/submissions',
+      onSelect: () => {
+        open.value = false
+      }
+    },
+    {
+      label: 'Placements',
+      icon: 'i-lucide-file-check',
+      to: '/placements',
+      onSelect: () => {
+        open.value = false
+      }
+    },
+    {
+      label: 'Offer Queue',
+      icon: 'i-lucide-phone-outgoing',
+      to: '/queue',
+      onSelect: () => {
+        open.value = false
+      }
+    },
+    {
+      label: 'School Capacity',
+      icon: 'i-lucide-school',
+      to: '/capacity',
+      onSelect: () => {
+        open.value = false
+      }
+    } /* {
   label: 'Inbox',
   icon: 'i-lucide-inbox',
   to: '/inbox',
@@ -85,7 +88,8 @@ const links = [[{
       open.value = false
     }
   }]
-}*/ ], /*[{
+} */
+  ] /* [{
   label: 'Feedback',
   icon: 'i-lucide-message-circle',
   to: 'https://github.com/nuxt-ui-pro/dashboard',
@@ -95,13 +99,15 @@ const links = [[{
   icon: 'i-lucide-info',
   to: 'https://github.com/nuxt/ui-pro',
   target: '_blank'
-}]*/]
+}] */
+]
 
-const groups = computed(() => [{
-  id: 'links',
-  label: 'Go to',
-  items: links.flat()
-}, /*{
+const groups = computed(() => [
+  {
+    id: 'links',
+    label: 'Go to',
+    items: links.flat()
+  } /* {
   id: 'code',
   label: 'Code',
   items: [{
@@ -111,7 +117,8 @@ const groups = computed(() => [{
     to: `https://github.com/nuxt-ui-pro/dashboard/blob/main/app/pages${route.path === '/' ? '/index' : route.path}.vue`,
     target: '_blank'
   }]
-}*/])
+} */
+])
 
 /*
 onMounted(async () => {
@@ -145,8 +152,13 @@ onMounted(async () => {
   <UDashboardGroup>
     <UDashboardSearch :groups="groups" />
 
-    <UDashboardSidebar v-model:open="open" collapsible resizable class="bg-(--ui-bg-elevated)/25"
-      :ui="{ footer: 'lg:border-t lg:border-(--ui-border)' }">
+    <UDashboardSidebar
+      v-model:open="open"
+      collapsible
+      resizable
+      class="bg-(--ui-bg-elevated)/25"
+      :ui="{ footer: 'lg:border-t lg:border-(--ui-border)' }"
+    >
       <template #header="{ collapsed }">
         <TeamsMenu :collapsed="collapsed" />
       </template>
@@ -156,7 +168,12 @@ onMounted(async () => {
 
         <UNavigationMenu :collapsed="collapsed" :items="links[0]" orientation="vertical" />
 
-        <UNavigationMenu :collapsed="collapsed" :items="links[1]" orientation="vertical" class="mt-auto" />
+        <UNavigationMenu
+          :collapsed="collapsed"
+          :items="links[1]"
+          orientation="vertical"
+          class="mt-auto"
+        />
       </template>
 
       <template #footer="{ collapsed }">

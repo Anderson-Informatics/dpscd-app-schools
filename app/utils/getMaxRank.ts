@@ -1,4 +1,4 @@
-import type { Result } from "~~/types/result";
+import type { Result } from '~~/types/result'
 
 export default function (
   SchoolID: number,
@@ -11,13 +11,13 @@ export default function (
       item.SchoolID === SchoolID &&
       item.Grade === Grade &&
       item.lotteryList === list
-  );
+  )
   const maxRank = Math.max(
     ...filteredList.map((x: Result) => x.adjustedRank ?? 0)
-  );
+  )
   if (maxRank === 0) {
-    return 0;
+    return 0
   } else {
-    return maxRank;
+    return maxRank
   }
 }

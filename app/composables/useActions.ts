@@ -19,20 +19,19 @@ export default function () {
   const buttonText = ref<string>('Check')
   const buttonDisabled = ref<boolean>(false)
   const pendingIds = ref<string[]>([])
-  const pendingLog = ref<
-    Array<{ submissionId: string; change: string } | null>
-  >([])
+  const pendingLog = ref<Array<{ submissionId: string; change: string } | null>>([])
   const changeLogged = ref<boolean>(false)
 
   const addLabel = (payload: Result, type: string) => {
-    settingsStore.settings.applyLabels
-      ? resultStore.addLabel(payload, type)
-      : null
+    if (settingsStore.settings.applyLabels) {
+      resultStore.addLabel(payload, type)
+    }
   }
+
   const deleteLabel = (payload: Result, type: string) => {
-    settingsStore.settings.applyLabels
-      ? resultStore.deleteLabel(payload, type)
-      : null
+    if (settingsStore.settings.applyLabels) {
+      resultStore.deleteLabel(payload, type)
+    }
   }
 
   const addResult = (payload: Qualification, submission: Submission) => {
@@ -52,19 +51,13 @@ export default function () {
     )
     let newList = ''
     if (waitlist.length > 0) {
-      console.log(
-        `Found ${waitlist.length} applicants on the waiting list for ${payload.School}`
-      )
+      console.log(`Found ${waitlist.length} applicants on the waiting list for ${payload.School}`)
       newList = 'Waiting List'
     } else if (offers.length > 0) {
-      console.log(
-        `Found ${offers.length} applicants on the offered list for ${payload.School}`
-      )
+      console.log(`Found ${offers.length} applicants on the offered list for ${payload.School}`)
       newList = 'Offered List'
     } else {
-      console.log(
-        `No applicants found for ${payload.School} in the offered or waiting list`
-      )
+      console.log(`No applicants found for ${payload.School} in the offered or waiting list`)
     }
     const newResult: Result = {
       _id: new Types.ObjectId().toString(),
@@ -81,12 +74,7 @@ export default function () {
       lotteryList: newList,
       comment: 'Added by user',
       adjustedRank:
-        getMaxRank(
-          payload.SchoolID,
-          payload.GradeEntering,
-          resultStore.results,
-          newList
-        ) + 1,
+        getMaxRank(payload.SchoolID, payload.GradeEntering, resultStore.results, newList) + 1,
       submissionDate: submission.submissionDate
     }
     console.log(`New Result: ${JSON.stringify(newResult)}`)
@@ -152,9 +140,7 @@ export default function () {
     const ids: string[] = filtered.map((item: Result) => item._id)
     if (payload.stage === 'Check') {
       // Add info to pending changes array to display as interim step
-      pendingChanges.value.push(
-        `Move ${ids.length} applicants up the ${payload.lotteryList}`
-      )
+      pendingChanges.value.push(`Move ${ids.length} applicants up the ${payload.lotteryList}`)
     }
     if (payload.stage === 'Submit Changes') {
       // Update the filtered Pinia Store
@@ -177,9 +163,7 @@ export default function () {
   const checkWaitlist = (payload: Result) => {
     console.log('Check Waitlist Function Triggered')
     // Get the capacity for the selected school
-    const school = resultStore.schools.find(
-      (item: School) => item.SchoolID === payload.SchoolID
-    )
+    const school = resultStore.schools.find((item: School) => item.SchoolID === payload.SchoolID)
 
     if (!school || !school.Capacity[payload.Grade]) {
       console.error('School or capacity not found for the given grade.')
@@ -199,8 +183,7 @@ export default function () {
         item.SchoolID === payload.SchoolID &&
         item.Grade === payload.Grade &&
         // Fix this to account for offer pending students
-        (item.lotteryList === 'Offered List' ||
-          item.queueStatus === 'Offer Pending')
+        (item.lotteryList === 'Offered List' || item.queueStatus === 'Offer Pending')
     ).length
     if (filled <= capacity) {
       makeOffer(payload)
@@ -237,9 +220,7 @@ export default function () {
       }
       changeStore.addChange(changeObj)
       // Update the Pinia store for the result being changed to "Decline"
-      const updObj = resultStore.results.find(
-        (item: Result) => item._id === payload._id
-      )
+      const updObj = resultStore.results.find((item: Result) => item._id === payload._id)
       if (updObj) {
         // Update Pinia store for updated object
         updObj.confirmedEnrollment = true
@@ -277,9 +258,7 @@ export default function () {
           item.lotteryList === 'Waiting List' &&
           item.queueStatus !== 'Offer Pending'
       )
-      .sort(
-        (a: Result, b: Result) => (a.adjustedRank ?? 0) - (b.adjustedRank ?? 0)
-      )[0]
+      .sort((a: Result, b: Result) => (a.adjustedRank ?? 0) - (b.adjustedRank ?? 0))[0]
     if (!offer) {
       console.log('No matching offer found.')
       return
@@ -327,12 +306,7 @@ export default function () {
   const moveToList = (payload: Result, list: string, changeLogged: boolean) => {
     console.log('Move to List Payload (composable function): ', payload)
     // Calculate the proper adjustedRank based on the new list
-    const maxRank = getMaxRank(
-      payload.SchoolID,
-      payload.Grade,
-      resultStore.results,
-      list
-    )
+    const maxRank = getMaxRank(payload.SchoolID, payload.Grade, resultStore.results, list)
     console.log(`Testing MaxRank Calculation: ${maxRank} on ${list}`)
     // This will mark the pending status and continue to similate the changes
     if (payload.stage === 'Check') {
@@ -351,8 +325,7 @@ export default function () {
     // Will run everytime to simulate the changes and/or make the changes
     adjustRankings(payload)
     if (
-      (payload.lotteryList === 'Offered List' ||
-        payload.queueStatus === 'Offer Pending') &&
+      (payload.lotteryList === 'Offered List' || payload.queueStatus === 'Offer Pending') &&
       (list === 'Forfeited' || list === 'Secondary Waitlist')
     ) {
       checkWaitlist(payload)
@@ -390,9 +363,7 @@ export default function () {
         addLabel(payload, 'Waitlist')
       }
       // Update the Pinia store for the result being changed to "Decline"
-      const updateObj = resultStore.results.find(
-        (item: Result) => item._id === payload._id
-      )
+      const updateObj = resultStore.results.find((item: Result) => item._id === payload._id)
       if (!updateObj) {
         console.log('No matching result found')
         return
@@ -477,15 +448,11 @@ export default function () {
     const lowerResults = resultStore.results.filter(
       (item: Result) =>
         item.submissionId === payload.submissionId &&
-        item.ChoiceRank > payload.ChoiceRank
+        item.ChoiceRank > payload.ChoiceRank &&
+        item.lotteryList !== 'Forfeited' // This will stop the redudant Forfeiting of a Forfetied seat.
     )
     // Use the getMaxRank util function to get the maxRank of the Offered List
-    const maxRank = getMaxRank(
-      payload.SchoolID,
-      payload.Grade,
-      resultStore.results,
-      'Offered List'
-    )
+    const maxRank = getMaxRank(payload.SchoolID, payload.Grade, resultStore.results, 'Offered List')
     // Run the decline offer for the other lower ranked Results
     lowerResults.forEach((item: Result) => {
       const temp = {
@@ -515,9 +482,7 @@ export default function () {
       }
       changeStore.addChange(changeObj)
       // Update the Pinia store for the result being changed to "Offered List"
-      const acceptObj = resultStore.results.find(
-        (item: Result) => item._id === payload._id
-      )
+      const acceptObj = resultStore.results.find((item: Result) => item._id === payload._id)
       if (!acceptObj) {
         throw new Error(`Result with id ${payload._id} not found`)
       }

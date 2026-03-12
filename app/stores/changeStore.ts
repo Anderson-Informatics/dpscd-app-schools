@@ -1,38 +1,46 @@
-import { defineStore } from "pinia";
-import type { Change } from "~~/types/change";
+import { defineStore } from 'pinia'
+import type { Change } from '~~/types/change'
 
-export const useChangeStore = defineStore("change-store", {
+const getErrorMessage = (error: unknown) => {
+  return error instanceof Error ? error.message : String(error)
+}
+
+export const useChangeStore = defineStore('change-store', {
   state: () => ({
     // list all results
-    changes: [] as Change[],
+    changes: [] as Change[]
   }),
   actions: {
     // Get all results from DB
     async getAll() {
       try {
-        let data = await $fetch<Change[]>("/api/changes");
-        this.changes = data;
-        return data;
-      } catch (e: any) {
-        console.log(e.message);
+        const { withYearQuery } = useAppYear()
+        const data = await $fetch<Change[]>('/api/changes', {
+          query: withYearQuery()
+        })
+        this.changes = data
+        return data
+      } catch (e: unknown) {
+        console.log(getErrorMessage(e))
       }
     },
     async addChange(body: Change) {
       try {
+        const { withYearBody } = useAppYear()
         // Maybe I can figure out how to fix this full URL in the long term?
-        let response = await $fetch("/api/changes/add", {
-          method: "POST",
-          body: body,
-        });
-        let resp2 = await $fetch("/api/submittable/note", {
-          method: "POST",
-          body: body,
-        });
-        console.log(response, resp2);
-        return [response, resp2];
-      } catch (e: any) {
-        console.log(e.message);
+        const response = await $fetch('/api/changes/add', {
+          method: 'POST',
+          body: withYearBody({ ...body })
+        })
+        const resp2 = await $fetch('/api/submittable/note', {
+          method: 'POST',
+          body: withYearBody({ ...body })
+        })
+        console.log(response, resp2)
+        return [response, resp2]
+      } catch (e: unknown) {
+        console.log(getErrorMessage(e))
       }
-    },
-  },
-});
+    }
+  }
+})

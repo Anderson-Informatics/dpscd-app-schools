@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose'
 
 const schema: mongoose.Schema = new mongoose.Schema({
   _id: String,
@@ -21,7 +21,8 @@ const schema: mongoose.Schema = new mongoose.Schema({
   Qualified: Boolean,
   Eligible: Boolean,
   EligibilityStatus: String,
-});
+  year: String
+})
 
 // qualifications model
-export default mongoose.model("Qualification", schema);
+export default mongoose.model('Qualification', schema)

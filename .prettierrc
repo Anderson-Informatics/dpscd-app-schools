@@ -3,5 +3,10 @@
   "semi": false,
   "tabWidth": 2,
   "trailingComma": "none",
-  "singleAttributePerLine": true
+  "printWidth": 100,
+  "quoteProps": "consistent",
+  "arrowParens": "always",
+  "htmlWhitespaceSensitivity": "strict",
+  "bracketSameLine": false,
+  "endOfLine": "lf"
 }

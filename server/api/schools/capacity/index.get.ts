@@ -1,17 +1,22 @@
-import SchoolModel from "~~/server/models/school.model";
-import ResultModel from "~~/server/models/result.model";
-import type { School, SchoolGrade, Count } from "~~/types/school";
+import SchoolModel from '~~/server/models/school.model'
+import ResultModel from '~~/server/models/result.model'
+import type { School, SchoolGrade, Count } from '~~/types/school'
+import { getYearFromEvent, withYearFilter } from '~~/server/utils/year'
 
 export default defineEventHandler(async (event) => {
-  const schools: School[] = await SchoolModel.find();
+  const year = getYearFromEvent(event)
+  const schools: School[] = await SchoolModel.find(withYearFilter(year))
 
   const counts: Count[] = await ResultModel.aggregate([
     {
+      $match: withYearFilter(year)
+    },
+    {
       $group: {
         _id: {
-          SchoolID: "$SchoolID",
-          School: "$School",
-          Grade: "$Grade",
+          SchoolID: '$SchoolID',
+          School: '$School',
+          Grade: '$Grade'
         },
         SeatsFilled: {
           $sum: {
@@ -19,17 +24,17 @@ export default defineEventHandler(async (event) => {
               if: {
                 $or: [
                   {
-                    $eq: ["Offered List", "$lotteryList"],
+                    $eq: ['Offered List', '$lotteryList']
                   },
                   {
-                    $eq: ["Offer Pending", "$queueStatus"],
-                  },
-                ],
+                    $eq: ['Offer Pending', '$queueStatus']
+                  }
+                ]
               },
               then: 1,
-              else: 0,
-            },
-          },
+              else: 0
+            }
+          }
         },
         OnWaitingList: {
           $sum: {
@@ -37,14 +42,14 @@ export default defineEventHandler(async (event) => {
               if: {
                 $or: [
                   {
-                    $eq: ["Waiting List", "$lotteryList"],
-                  },
-                ],
+                    $eq: ['Waiting List', '$lotteryList']
+                  }
+                ]
               },
               then: 1,
-              else: 0,
-            },
-          },
+              else: 0
+            }
+          }
         },
         OnSecondaryWaitingList: {
           $sum: {
@@ -52,85 +57,85 @@ export default defineEventHandler(async (event) => {
               if: {
                 $or: [
                   {
-                    $eq: ["Secondary Waitlist", "$lotteryList"],
-                  },
-                ],
+                    $eq: ['Secondary Waitlist', '$lotteryList']
+                  }
+                ]
               },
               then: 1,
-              else: 0,
-            },
-          },
-        },
-      },
-    },
-  ]);
+              else: 0
+            }
+          }
+        }
+      }
+    }
+  ])
 
   const schcap = schools.map((item: School) => ({
     SchoolID: item.SchoolID,
     School: item.SchoolName,
-    ...item.Capacity,
-  }));
+    ...item.Capacity
+  }))
 
   const unwindCapacity = (object: School) => {
     return Object.keys(object.Capacity).map((item) => ({
       SchoolID: Number(object.SchoolID),
       School: object.SchoolName,
       Grade: item,
-      Capacity: object.Capacity[item] ?? 0,
-    }));
-  };
+      Capacity: object.Capacity[item] ?? 0
+    }))
+  }
 
   const createCapacity = (x: School[]) => {
-    let full: {
-      SchoolID: number;
-      School: string;
-      Grade: string;
-      Capacity: number;
-    }[] = [];
+    const full: {
+      SchoolID: number
+      School: string
+      Grade: string
+      Capacity: number
+    }[] = []
     x.forEach((element) => {
-      full.push(...unwindCapacity(element));
-    });
-    return full;
-  };
+      full.push(...unwindCapacity(element))
+    })
+    return full
+  }
 
-  const unwound = createCapacity(schools);
+  const unwound = createCapacity(schools)
 
   const seats = counts
     .map((item) => ({
       ...item._id,
-      ...item,
+      ...item
     }))
-    .map(({ _id, ...item }) => item);
+    .map(({ _id, ...item }) => item)
 
   const partialCapacityTable: {
-    SchoolID: number;
-    School: string;
-    Grade: string;
-    Capacity: number;
-    SeatsFilled: number;
-    OnWaitingList: number;
-    OnSecondaryWaitingList: number;
-  }[] = [];
+    SchoolID: number
+    School: string
+    Grade: string
+    Capacity: number
+    SeatsFilled: number
+    OnWaitingList: number
+    OnSecondaryWaitingList: number
+  }[] = []
 
   seats.forEach((seat) => {
     const capacityItem = unwound.find(
       (item) => seat.SchoolID === item.SchoolID && seat.Grade === item.Grade
-    );
+    )
 
     if (capacityItem) {
       partialCapacityTable.push({
         ...seat,
-        ...capacityItem,
-      });
+        ...capacityItem
+      })
     }
-  });
+  })
 
   const fullCapacityTable = partialCapacityTable.map((item) => ({
     ...item,
-    SeatsAvailable: item.Capacity - item.SeatsFilled,
-  }));
+    SeatsAvailable: item.Capacity - item.SeatsFilled
+  }))
 
-  //const clean = seats.map(({ _id, ...item }) => item);
+  // const clean = seats.map(({ _id, ...item }) => item);
 
-  return fullCapacityTable;
-});
+  return fullCapacityTable
+})

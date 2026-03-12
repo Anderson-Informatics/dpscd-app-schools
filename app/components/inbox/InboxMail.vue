@@ -8,19 +8,28 @@ defineProps<{
 
 const emits = defineEmits(['close'])
 
-const dropdownItems = [[{
-  label: 'Mark as unread',
-  icon: 'i-lucide-check-circle'
-}, {
-  label: 'Mark as important',
-  icon: 'i-lucide-triangle-alert'
-}], [{
-  label: 'Star thread',
-  icon: 'i-lucide-star'
-}, {
-  label: 'Mute thread',
-  icon: 'i-lucide-circle-pause'
-}]]
+const dropdownItems = [
+  [
+    {
+      label: 'Mark as unread',
+      icon: 'i-lucide-check-circle'
+    },
+    {
+      label: 'Mark as important',
+      icon: 'i-lucide-triangle-alert'
+    }
+  ],
+  [
+    {
+      label: 'Star thread',
+      icon: 'i-lucide-star'
+    },
+    {
+      label: 'Mute thread',
+      icon: 'i-lucide-circle-pause'
+    }
+  ]
+]
 
 const toast = useToast()
 
@@ -47,7 +56,10 @@ function onSubmit() {
 
 <template>
   <UDashboardPanel id="inbox-2">
-    <UDashboardNavbar :title="mail.subject" :toggle="false">
+    <UDashboardNavbar
+      :title="mail.subject"
+      :toggle="false"
+    >
       <template #leading>
         <UButton
           icon="i-lucide-x"
@@ -59,6 +71,7 @@ function onSubmit() {
       </template>
 
       <template #right>
+        <ActiveYearBadge />
         <UTooltip text="Archive">
           <UButton
             icon="i-lucide-inbox"
@@ -68,7 +81,11 @@ function onSubmit() {
         </UTooltip>
 
         <UTooltip text="Reply">
-          <UButton icon="i-lucide-reply" color="neutral" variant="ghost" />
+          <UButton
+            icon="i-lucide-reply"
+            color="neutral"
+            variant="ghost"
+          />
         </UTooltip>
 
         <UDropdownMenu :items="dropdownItems">
@@ -111,9 +128,16 @@ function onSubmit() {
     </div>
 
     <div class="pb-4 px-4 sm:px-6 shrink-0">
-      <UCard variant="subtle" class="mt-auto" :ui="{ header: 'flex items-center gap-1.5 text-(--ui-text-dimmed)' }">
+      <UCard
+        variant="subtle"
+        class="mt-auto"
+        :ui="{ header: 'flex items-center gap-1.5 text-(--ui-text-dimmed)' }"
+      >
         <template #header>
-          <UIcon name="i-lucide-reply" class="size-5" />
+          <UIcon
+            name="i-lucide-reply"
+            class="size-5"
+          />
 
           <span class="text-sm truncate">
             Reply to {{ mail.from.name }} ({{ mail.from.email }})

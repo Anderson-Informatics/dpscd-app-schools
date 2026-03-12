@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useMSAuth } from "~/composables/useMSAuth"
+import { useMSAuth } from '~/composables/useMSAuth'
 
 definePageMeta({
   title: 'Login',
@@ -7,39 +7,22 @@ definePageMeta({
   layout: 'unauthorized'
 })
 
-const msAuth = useMSAuth();
+const msAuth = useMSAuth()
 
 async function login() {
   await msAuth.signIn()
 }
 
-const toast = useToast()
-
-const fields = [{
-  name: 'email',
-  type: 'text' as const,
-  label: 'Email',
-  placeholder: 'Enter your email',
-  required: true
-}, {
-  name: 'password',
-  label: 'Password',
-  type: 'password' as const,
-  placeholder: 'Enter your password'
-}, {
-  name: 'remember',
-  label: 'Remember me',
-  type: 'checkbox' as const
-}]
-
-const providers = [{
-  label: 'DPSCD Microsoft SSO',
-  icon: 'i-simple-icons-microsoft',
-  onClick: () => {
-    login()
-    //toast.add({ title: 'Microsoft', description: 'Login with Microsoft' })
+const providers = [
+  {
+    label: 'DPSCD Microsoft SSO',
+    icon: 'i-simple-icons-microsoft',
+    onClick: () => {
+      login()
+      // toast.add({ title: 'Microsoft', description: 'Login with Microsoft' })
+    }
   }
-}]
+]
 </script>
 
 <template>
