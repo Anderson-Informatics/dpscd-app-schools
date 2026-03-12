@@ -17,7 +17,8 @@ const links = [
             to: '/settings/members'
           }
         ]
-      : []),
+      : [])
+    /*
     {
       label: 'Notifications',
       icon: 'i-lucide-bell',
@@ -28,7 +29,9 @@ const links = [
       icon: 'i-lucide-shield',
       to: '/settings/security'
     }
-  ],
+    */
+  ]
+  /*
   [
     {
       label: 'Documentation',
@@ -43,6 +46,7 @@ const links = [
       target: '_blank'
     }
   ]
+  */
 ]
 </script>
 
