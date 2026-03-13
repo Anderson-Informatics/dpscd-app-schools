@@ -4,7 +4,9 @@ import { useAppUser } from '#imports'
 
 export default defineNuxtRouteMiddleware(async (to, _from) => {
   if (import.meta.server) return
-  if (to.name === '/login') return
+
+  const loginPath = '/login'
+  const unassignedPath = '/unassigned'
 
   const msAuth = useMSAuth()
   const accounts = msAuth.getAccounts()
@@ -52,11 +54,26 @@ export default defineNuxtRouteMiddleware(async (to, _from) => {
     }
   }
 
-  if (to.name !== 'login' && !isAuthenticated) {
-    return navigateTo('/login', { replace: true })
-  } else if (to.name === 'login' && isAuthenticated) {
-    return navigateTo('/', { replace: true })
-  } else {
+  if (!isAuthenticated) {
+    if (to.path !== loginPath) {
+      return navigateTo(loginPath, { replace: true })
+    }
+
     return
   }
+
+  const role = userStore.value.user.role
+  if (role === 'unassigned') {
+    if (to.path !== unassignedPath) {
+      return navigateTo(unassignedPath, { replace: true })
+    }
+
+    return
+  }
+
+  if (to.path === loginPath || to.path === unassignedPath) {
+    return navigateTo('/', { replace: true })
+  }
+
+  return
 })

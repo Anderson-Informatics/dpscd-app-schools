@@ -25,7 +25,8 @@ const items = computed(() => {
           await refreshNuxtData()
         }
       }
-    })),
+    }))
+    /*
     [
       {
         label: 'Create team',
@@ -36,6 +37,7 @@ const items = computed(() => {
         icon: 'i-lucide-cog'
       }
     ]
+    */
   ]
 })
 </script>
