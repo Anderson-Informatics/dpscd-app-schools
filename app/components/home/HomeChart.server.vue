@@ -3,7 +3,7 @@
     <template #header>
       <div>
         <p class="text-xs text-(--ui-text-muted) uppercase mb-1.5">
-          Revenue
+          Submissions
         </p>
         <p class="text-3xl text-(--ui-text-highlighted) font-semibold">
           ---

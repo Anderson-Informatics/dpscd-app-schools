@@ -1,7 +1,18 @@
 <script setup lang="ts">
-import { eachDayOfInterval, eachWeekOfInterval, eachMonthOfInterval, format } from 'date-fns'
+import {
+  eachDayOfInterval,
+  eachWeekOfInterval,
+  eachMonthOfInterval,
+  endOfDay,
+  format,
+  isWithinInterval,
+  startOfDay,
+  startOfMonth,
+  startOfWeek
+} from 'date-fns'
 import { VisXYContainer, VisLine, VisAxis, VisArea, VisCrosshair, VisTooltip } from '@unovis/vue'
 import type { Period, Range } from '~/types'
+import type { Submission } from '~~/types/submission'
 
 const cardRef = useTemplateRef<HTMLElement | null>('cardRef')
 
@@ -12,34 +23,74 @@ const props = defineProps<{
 
 type DataRecord = {
   date: Date
-  amount: number
+  count: number
 }
 
 const { width } = useElementSize(cardRef)
+const { withYearQuery } = useAppYear()
 
-// We use `useAsyncData` here to have same random data on the client and server
-const { data } = await useAsyncData<DataRecord[]>(async () => {
+const { data: submissions } = await useAsyncData<Submission[]>(async () => {
+  return $fetch('/api/submissions', {
+    query: withYearQuery()
+  })
+}, {
+  watch: [() => withYearQuery().year],
+  default: () => []
+})
+
+const data = computed<DataRecord[]>(() => {
   const dates = ({
     daily: eachDayOfInterval,
     weekly: eachWeekOfInterval,
     monthly: eachMonthOfInterval
   } as Record<Period, typeof eachDayOfInterval>)[props.period](props.range)
 
-  const min = 1000
-  const max = 10000
+  const bucketKey = (date: Date) => {
+    if (props.period === 'monthly') {
+      return startOfMonth(date).toISOString()
+    }
 
-  return dates.map((date) => ({ date, amount: Math.floor(Math.random() * (max - min + 1)) + min }))
-}, {
-  watch: [() => props.period, () => props.range],
-  default: () => []
+    if (props.period === 'weekly') {
+      return startOfWeek(date).toISOString()
+    }
+
+    return startOfDay(date).toISOString()
+  }
+
+  const counts = new Map<string, number>(dates.map((date) => [bucketKey(date), 0]))
+  const interval = {
+    start: startOfDay(props.range.start),
+    end: endOfDay(props.range.end)
+  }
+
+  for (const submission of submissions.value) {
+    const submittedAt = new Date(submission.submissionDate)
+    if (Number.isNaN(submittedAt.getTime())) {
+      continue
+    }
+
+    if (!isWithinInterval(submittedAt, interval)) {
+      continue
+    }
+
+    const key = bucketKey(submittedAt)
+    if (counts.has(key)) {
+      counts.set(key, (counts.get(key) ?? 0) + 1)
+    }
+  }
+
+  return dates.map((date) => ({
+    date,
+    count: counts.get(bucketKey(date)) ?? 0
+  }))
 })
 
 const x = (_: DataRecord, i: number) => i
-const y = (d: DataRecord) => d.amount
+const y = (d: DataRecord) => d.count
 
-const total = computed(() => data.value.reduce((acc: number, { amount }) => acc + amount, 0))
+const total = computed(() => data.value.reduce((acc: number, { count }) => acc + count, 0))
 
-const formatNumber = new Intl.NumberFormat('en', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format
+const formatNumber = new Intl.NumberFormat('en').format
 
 const formatDate = (date: Date): string => {
   return ({
@@ -57,7 +108,7 @@ const xTicks = (i: number) => {
   return formatDate(data.value[i].date)
 }
 
-const template = (d: DataRecord) => `${formatDate(d.date)}: ${formatNumber(d.amount)}`
+const template = (d: DataRecord) => `${formatDate(d.date)}: ${formatNumber(d.count)} submissions`
 </script>
 
 <template>
@@ -65,7 +116,7 @@ const template = (d: DataRecord) => `${formatDate(d.date)}: ${formatNumber(d.amo
     <template #header>
       <div>
         <p class="text-xs text-(--ui-text-muted) uppercase mb-1.5">
-          Revenue
+          Submissions
         </p>
         <p class="text-3xl text-(--ui-text-highlighted) font-semibold">
           {{ formatNumber(total) }}

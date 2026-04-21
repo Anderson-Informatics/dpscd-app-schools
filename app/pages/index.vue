@@ -1,8 +1,7 @@
 <script setup lang="ts">
 const router = useRouter()
+
 onMounted(() => {
-  // This will run when the component is mounted
-  // You can perform any setup or initialization here if needed
   router.push('/placements')
 })
 </script>

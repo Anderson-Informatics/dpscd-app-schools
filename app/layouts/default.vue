@@ -42,6 +42,22 @@ const links = [
       onSelect: () => {
         open.value = false
       }
+    },
+    {
+      label: 'Eligibility',
+      icon: 'i-lucide-badge-check',
+      to: '/eligibility',
+      onSelect: () => {
+        open.value = false
+      }
+    },
+    {
+      label: 'Reviews',
+      icon: 'i-lucide-chart-pie',
+      to: '/reviews',
+      onSelect: () => {
+        open.value = false
+      }
     } /* {
   label: 'Inbox',
   icon: 'i-lucide-inbox',
@@ -170,7 +186,7 @@ onMounted(async () => {
 
         <UNavigationMenu
           :collapsed="collapsed"
-          :items="links[1]"
+          :items="links[1] || []"
           orientation="vertical"
           class="mt-auto"
         />
