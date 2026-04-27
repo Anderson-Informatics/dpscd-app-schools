@@ -10,4 +10,5 @@ export type ExamCompletion = {
   ExamTaken?: boolean | null
   ExamScore?: number | null
   complete: boolean
+  year?: string | number
 }

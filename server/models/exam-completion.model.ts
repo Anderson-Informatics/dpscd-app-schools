@@ -11,6 +11,7 @@ type ExamCompletionDocument = {
   ExamTaken?: boolean
   ExamScore?: number
   complete?: boolean
+  year?: string | number
 }
 
 const schema: mongoose.Schema = new mongoose.Schema(
@@ -24,19 +25,16 @@ const schema: mongoose.Schema = new mongoose.Schema(
     TestDate: Date,
     ExamTaken: Boolean,
     ExamScore: Number,
-    complete: Boolean
+    complete: Boolean,
+    year: mongoose.Schema.Types.Mixed
   },
   {
     collection: 'exam_completions'
   }
 )
 
-const examCompletionsDb = mongoose.connection.useDb('exam_completions', {
-  useCache: true
-})
-
 const ExamCompletionModel =
-  (examCompletionsDb.models.ExamCompletion as mongoose.Model<ExamCompletionDocument>) ||
-  examCompletionsDb.model<ExamCompletionDocument>('ExamCompletion', schema)
+  (mongoose.models.ExamCompletion as mongoose.Model<ExamCompletionDocument>) ||
+  mongoose.model<ExamCompletionDocument>('ExamCompletion', schema)
 
 export default ExamCompletionModel
