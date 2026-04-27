@@ -52,9 +52,9 @@ const links = [
       }
     },
     {
-      label: 'Reviews',
+      label: 'Completion Tracker',
       icon: 'i-lucide-chart-pie',
-      to: '/reviews',
+      to: '/completion',
       onSelect: () => {
         open.value = false
       }

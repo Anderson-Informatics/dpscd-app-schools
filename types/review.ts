@@ -4,6 +4,7 @@ export type Review = {
   submissionIdInt: string
   FullName: string
   GradeEntering: string
+  Round?: string | null
   ReviewType: string
   completedAt?: string | null
   score?: number | null
