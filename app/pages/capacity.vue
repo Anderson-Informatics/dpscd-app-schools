@@ -32,12 +32,19 @@ const selectedSchoolForEdit = ref<SchoolGrade | null>(null)
 const schoolCapacitiesForEdit = ref<SchoolGrade[]>([])
 const isSavingCapacity = ref(false)
 
+const gradeOrder = (grade: string) => {
+  if (grade === 'Pre-K') return -1
+  if (grade === 'Kindergarten') return 0
+  return parseInt(grade) || 999
+}
+
 const openEditModal = (schoolGrade: SchoolGrade) => {
   selectedSchoolForEdit.value = schoolGrade
   // Get all grades for this school
   schoolCapacitiesForEdit.value = resultStore.capacity
     .filter((item) => item.School === schoolGrade.School && item.SchoolID === schoolGrade.SchoolID)
     .map((item) => ({ ...item })) // Deep copy for editing
+    .sort((a, b) => gradeOrder(a.Grade) - gradeOrder(b.Grade)) // Sort: Pre-K, K, then 1-8
   editModalOpen.value = true
 }
 
@@ -441,13 +448,13 @@ const pagination = ref({
         class="space-y-4"
         @submit.prevent="handleCapacityUpdate"
       >
+        <p class="text-sm text-gray-600 mb-4">Set capacity to -1 if this grade is not offered at this school.</p>
         <div class="grid gap-3 sm:grid-cols-2">
           <UFormField
             v-for="(capacity, index) in schoolCapacitiesForEdit"
             :key="`${capacity.SchoolID}-${capacity.Grade}`"
             :label="`Grade ${capacity.Grade}`"
             :name="`capacity-${index}`"
-            description="Set to -1 if this grade is not offered"
           >
             <UInput
               v-model.number="capacity.Capacity"
