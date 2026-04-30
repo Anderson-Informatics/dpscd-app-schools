@@ -14,9 +14,9 @@ export default defineEventHandler(async (event) => {
       year
     })
     return response
-  } catch (e: any) {
+  } catch (e: unknown) {
     throw createError({
-      message: e.message
+      message: e instanceof Error ? e.message : 'Unable to add change'
     })
   }
 })

@@ -11,9 +11,9 @@ export default defineEventHandler(async (event) => {
   try {
     await ResultModel.insertOne({ ...body, year })
     return { message: 'Lottery placement result added' }
-  } catch (e: any) {
+  } catch (e: unknown) {
     throw createError({
-      message: e.message
+      message: e instanceof Error ? e.message : 'Unable to add result'
     })
   }
 })

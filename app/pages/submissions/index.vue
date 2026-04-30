@@ -426,9 +426,7 @@ const pagination = ref({
         }"
       />
 
-      <div
-        class="flex items-center justify-between gap-3 border-t border-(--ui-border) pt-4 mt-auto"
-      >
+      <div class="flex items-center justify-between gap-3 border-t border-(--ui-border) pt-4 mt-auto">
         <div class="text-sm text-(--ui-text-muted)">
           {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0 }}
           of

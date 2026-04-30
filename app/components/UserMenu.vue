@@ -193,7 +193,7 @@ const items = computed<DropdownMenuItem[][]>(() => [
   icon: 'i-lucide-layout-template',
   children: [{
     label: 'Starter',
-    to: 'https://ui-pro-starter.nuxt.dev/'
+    to: 'https://ui.nuxt.com/'
   }, {
     label: 'Landing',
     to: 'https://landing-template.nuxt.dev/'
@@ -212,17 +212,17 @@ const items = computed<DropdownMenuItem[][]>(() => [
 }], [{
   label: 'Documentation',
   icon: 'i-lucide-book-open',
-  to: 'https://ui.nuxt.com/getting-started/installation/pro/nuxt',
+  to: 'https://ui.nuxt.com/getting-started/installation/nuxt',
   target: '_blank'
 }, {
   label: 'GitHub repository',
   icon: 'i-simple-icons-github',
-  to: 'https://github.com/nuxt-ui-pro/dashboard',
+  to: 'https://github.com/nuxt/ui',
   target: '_blank'
 }, {
-  label: 'Upgrade to Pro',
+  label: 'Nuxt UI Website',
   icon: 'i-lucide-rocket',
-  to: 'https://ui.nuxt.com/pro/purchase',
+  to: 'https://ui.nuxt.com',
   target: '_blank'
 }],
 */

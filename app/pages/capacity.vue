@@ -11,18 +11,54 @@ const UButton = resolveComponent('UButton')
 const UDropdownMenu = resolveComponent('UDropdownMenu')
 
 const table = useTemplateRef('table')
-const { withYearQuery } = useAppYear()
+const { year, withYearQuery } = useAppYear()
 
 // Get the results and schools data from the Pinia store
 const resultStore = useResultStore()
-await useAsyncData('results', () => resultStore.getAll(), {})
-await useAsyncData('pendingOffers', () => resultStore.getPending(), {})
-await useAsyncData('schools', () => resultStore.getSchools(), {})
-await useAsyncData('capacity', () => resultStore.getCapacity(), {})
+await useAsyncData('results', () => resultStore.getAll(), { watch: [year] })
+await useAsyncData('pendingOffers', () => resultStore.getPending(), { watch: [year] })
+await useAsyncData('schools', () => resultStore.getSchools(), { watch: [year] })
+await useAsyncData('capacity', () => resultStore.getCapacity(), { watch: [year] })
 const changeStore = useChangeStore()
-await useAsyncData('changes', () => changeStore.getAll(), {})
+await useAsyncData('changes', () => changeStore.getAll(), { watch: [year] })
 const settingsStore = useSettingsStore()
-await useAsyncData('settings', () => settingsStore.getSettings(), {})
+await useAsyncData('settings', () => settingsStore.getSettings(), { watch: [year] })
+
+// Admin check and edit modal state
+const userStore = useAppUser()
+const isAdmin = computed(() => userStore.value.user.role === 'central office admin')
+const editModalOpen = ref(false)
+const selectedSchoolForEdit = ref<SchoolGrade | null>(null)
+const schoolCapacitiesForEdit = ref<SchoolGrade[]>([])
+const isSavingCapacity = ref(false)
+
+const openEditModal = (schoolGrade: SchoolGrade) => {
+  selectedSchoolForEdit.value = schoolGrade
+  // Get all grades for this school
+  schoolCapacitiesForEdit.value = resultStore.capacity
+    .filter((item) => item.School === schoolGrade.School && item.SchoolID === schoolGrade.SchoolID)
+    .map((item) => ({ ...item })) // Deep copy for editing
+  editModalOpen.value = true
+}
+
+const handleCapacityUpdate = async () => {
+  if (!selectedSchoolForEdit.value) return
+  try {
+    isSavingCapacity.value = true
+    // Update each grade capacity
+    for (const capacity of schoolCapacitiesForEdit.value) {
+      await resultStore.updateCapacity(capacity)
+    }
+    await resultStore.getCapacity()
+    editModalOpen.value = false
+    selectedSchoolForEdit.value = null
+    schoolCapacitiesForEdit.value = []
+  } catch (e) {
+    console.error('Error updating capacity:', e)
+  } finally {
+    isSavingCapacity.value = false
+  }
+}
 
 const columnVisibility = ref({ _id: false })
 const rowSelection = ref({})
@@ -214,6 +250,24 @@ const columns: TableColumn<SchoolGrade>[] = [
         onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
       })
     }
+  },
+  {
+    id: 'actions',
+    header: 'Actions',
+    enableHiding: false,
+    cell: ({ row }) => {
+      if (!isAdmin.value) return null
+      return h('div', { class: 'flex gap-2' }, [
+        h(UButton, {
+          size: 'sm',
+          color: 'primary',
+          variant: 'soft',
+          icon: 'i-lucide-pencil',
+          label: 'Edit',
+          onClick: () => openEditModal(row.original as SchoolGrade)
+        })
+      ])
+    }
   }
 ]
 
@@ -372,4 +426,54 @@ const pagination = ref({
       </div>
     </template>
   </UDashboardPanel>
+
+  <!-- Edit Capacity Modal -->
+  <UModal
+    v-model:open="editModalOpen"
+    title="Edit School Capacity"
+    :description="selectedSchoolForEdit ? `Update grade capacities for ${selectedSchoolForEdit.School}` : undefined"
+    :ui="{ content: 'sm:max-w-2xl' }"
+  >
+    <template #body>
+      <UForm
+        v-if="selectedSchoolForEdit"
+        :state="{ rows: schoolCapacitiesForEdit }"
+        class="space-y-4"
+        @submit.prevent="handleCapacityUpdate"
+      >
+        <div class="grid gap-3 sm:grid-cols-2">
+          <UFormField
+            v-for="(capacity, index) in schoolCapacitiesForEdit"
+            :key="`${capacity.SchoolID}-${capacity.Grade}`"
+            :label="`Grade ${capacity.Grade}`"
+            :name="`capacity-${index}`"
+            description="Set to -1 if this grade is not offered"
+          >
+            <UInput
+              v-model.number="capacity.Capacity"
+              class="w-full"
+              type="number"
+              min="-1"
+              placeholder="Enter capacity"
+            />
+          </UFormField>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <UButton
+            label="Cancel"
+            color="neutral"
+            variant="outline"
+            @click="editModalOpen = false"
+          />
+          <UButton
+            label="Save Changes"
+            type="submit"
+            color="primary"
+            :loading="isSavingCapacity"
+          />
+        </div>
+      </UForm>
+    </template>
+  </UModal>
 </template>

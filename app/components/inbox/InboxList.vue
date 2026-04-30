@@ -6,7 +6,7 @@ const props = defineProps<{
   mails: Mail[]
 }>()
 
-const mailsRefs = ref<Element[]>([])
+const mailsRefs = ref<Record<string, HTMLElement | null>>({})
 
 const selectedMail = defineModel<Mail | null>()
 
@@ -14,7 +14,7 @@ watch(selectedMail, () => {
   if (!selectedMail.value) {
     return
   }
-  const ref = mailsRefs.value[selectedMail.value.id]
+  const ref = mailsRefs.value[String(selectedMail.value.id)]
   if (ref) {
     ref.scrollIntoView({ block: 'nearest' })
   }
@@ -47,7 +47,7 @@ defineShortcuts({
     <div
       v-for="(mail, index) in mails"
       :key="index"
-      :ref="el => { mailsRefs[mail.id] = el as Element }"
+      :ref="el => { mailsRefs[String(mail.id)] = el as HTMLElement | null }"
     >
       <div
         class="p-4 sm:px-6 text-sm cursor-pointer border-l-2 transition-colors"

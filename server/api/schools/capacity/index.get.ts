@@ -1,6 +1,6 @@
 import SchoolModel from '~~/server/models/school.model'
 import ResultModel from '~~/server/models/result.model'
-import type { School, SchoolGrade, Count } from '~~/types/school'
+import type { School, Count } from '~~/types/school'
 import { getYearFromEvent, withYearFilter } from '~~/server/utils/year'
 
 export default defineEventHandler(async (event) => {
@@ -70,12 +70,6 @@ export default defineEventHandler(async (event) => {
     }
   ])
 
-  const schcap = schools.map((item: School) => ({
-    SchoolID: item.SchoolID,
-    School: item.SchoolName,
-    ...item.Capacity
-  }))
-
   const unwindCapacity = (object: School) => {
     return Object.keys(object.Capacity).map((item) => ({
       SchoolID: Number(object.SchoolID),
@@ -107,35 +101,27 @@ export default defineEventHandler(async (event) => {
     }))
     .map(({ _id, ...item }) => item)
 
-  const partialCapacityTable: {
-    SchoolID: number
-    School: string
-    Grade: string
-    Capacity: number
-    SeatsFilled: number
-    OnWaitingList: number
-    OnSecondaryWaitingList: number
-  }[] = []
-
+  // Create a map of seats for quick lookup
+  const seatsMap = new Map<string, (typeof seats)[0]>()
   seats.forEach((seat) => {
-    const capacityItem = unwound.find(
-      (item) => seat.SchoolID === item.SchoolID && seat.Grade === item.Grade
-    )
-
-    if (capacityItem) {
-      partialCapacityTable.push({
-        ...seat,
-        ...capacityItem
-      })
-    }
+    const key = `${seat.SchoolID}|${seat.Grade}`
+    seatsMap.set(key, seat)
   })
 
-  const fullCapacityTable = partialCapacityTable.map((item) => ({
-    ...item,
-    SeatsAvailable: item.Capacity - item.SeatsFilled
-  }))
+  // Include all schools and grades, merging in seat data where available
+  const fullCapacityTable = unwound.map((school) => {
+    const key = `${school.SchoolID}|${school.Grade}`
+    const seatData = seatsMap.get(key)
+    const capacity = school.Capacity ?? 0
 
-  // const clean = seats.map(({ _id, ...item }) => item);
+    return {
+      ...school,
+      SeatsFilled: seatData?.SeatsFilled ?? 0,
+      OnWaitingList: seatData?.OnWaitingList ?? 0,
+      OnSecondaryWaitingList: seatData?.OnSecondaryWaitingList ?? 0,
+      SeatsAvailable: capacity === -1 ? -1 : capacity - (seatData?.SeatsFilled ?? 0)
+    }
+  })
 
   return fullCapacityTable
 })

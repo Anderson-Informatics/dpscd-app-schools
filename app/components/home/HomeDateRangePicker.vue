@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { DateFormatter, getLocalTimeZone, CalendarDate, today } from '@internationalized/date'
+import type { DateRange } from 'reka-ui'
 import type { Range } from '~/types'
 
 const df = new DateFormatter('en-US', {
@@ -29,11 +30,11 @@ const calendarRange = computed({
   get: () => ({
     start: selected.value.start ? toCalendarDate(selected.value.start) : undefined,
     end: selected.value.end ? toCalendarDate(selected.value.end) : undefined
-  }),
-  set: (newValue: { start: CalendarDate | null, end: CalendarDate | null }) => {
+  } as DateRange),
+  set: (newValue: DateRange | null) => {
     selected.value = {
-      start: newValue.start ? newValue.start.toDate(getLocalTimeZone()) : new Date(),
-      end: newValue.end ? newValue.end.toDate(getLocalTimeZone()) : new Date()
+      start: newValue?.start ? newValue.start.toDate(getLocalTimeZone()) : new Date(),
+      end: newValue?.end ? newValue.end.toDate(getLocalTimeZone()) : new Date()
     }
   }
 })

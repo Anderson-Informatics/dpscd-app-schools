@@ -31,9 +31,8 @@ const schema: mongoose.Schema = new mongoose.Schema({
 })
 
 // Update the updatedAt timestamp on save
-schema.pre('save', function (next) {
+schema.pre('save', function () {
   this.updatedAt = new Date()
-  next()
 })
 
 // users model

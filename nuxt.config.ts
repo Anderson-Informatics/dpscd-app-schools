@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['@nuxt/eslint', '@nuxt/ui-pro', '@vueuse/nuxt', '@pinia/nuxt'],
+  modules: ['@nuxt/eslint', '@nuxt/ui', '@vueuse/nuxt', '@pinia/nuxt'],
 
   plugins: [{ src: '~/plugins/msal.ts', mode: 'client' }],
   ssr: false,
@@ -23,21 +23,11 @@ export default defineNuxtConfig({
     SUBMITTABLE_API_KEY: process.env.SUBMITTABLE_API_KEY
   },
 
-  routeRules: {
-    '/api/**': {
-      cors: true
-    }
-  },
-
   future: {
     compatibilityVersion: 4
   },
 
   compatibilityDate: '2024-07-11',
-
-  nitro: {
-    plugins: ['~~/server/plugins/mongodb.ts']
-  },
 
   eslint: {
     config: {

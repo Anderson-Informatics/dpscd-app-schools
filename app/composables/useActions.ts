@@ -1,9 +1,13 @@
-import { Types } from 'mongoose'
 import type { Result } from '~~/types/result'
 import type { Change } from '~~/types/change'
 import type { School } from '~~/types/school'
 import type { Qualification } from '~~/types/qualification'
 import type { Submission } from '~~/types/submission'
+
+const generateClientId = () => {
+  // Keep IDs short and hex-like to stay compatible with existing string _id usage.
+  return crypto.randomUUID().replace(/-/g, '').slice(0, 24)
+}
 
 export default function () {
   const toast = useToast()
@@ -60,7 +64,7 @@ export default function () {
       console.log(`No applicants found for ${payload.School} in the offered or waiting list`)
     }
     const newResult: Result = {
-      _id: new Types.ObjectId().toString(),
+      _id: generateClientId(),
       submissionId: payload.submissionId,
       rank: newRank,
       Grade: payload.GradeEntering,

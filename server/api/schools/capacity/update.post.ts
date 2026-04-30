@@ -9,19 +9,16 @@ export default defineEventHandler(async (event) => {
 
   // Update a result
   try {
-    await SchoolModel.updateOne(
-      withYearFilter(year, { SchoolID: body.SchoolID }),
-      {
-        $set: {
-          [`Capacity.${body.Grade}`]: body.Capacity,
-          year
-        }
+    await SchoolModel.updateOne(withYearFilter(year, { SchoolID: body.SchoolID }), {
+      $set: {
+        [`Capacity.${body.Grade}`]: body.Capacity,
+        year
       }
-    )
+    })
     return { message: 'Capacity updated' }
-  } catch (e: any) {
+  } catch (e: unknown) {
     throw createError({
-      message: e.message
+      message: e instanceof Error ? e.message : 'Unable to update capacity'
     })
   }
 })

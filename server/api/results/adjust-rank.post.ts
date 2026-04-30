@@ -13,9 +13,9 @@ export default defineEventHandler(async (event) => {
       { $inc: { adjustedRank: -1 } }
     )
     return filtered
-  } catch (e: any) {
+  } catch (e: unknown) {
     throw createError({
-      message: e.message
+      message: e instanceof Error ? e.message : 'Unable to adjust rank'
     })
   }
 })

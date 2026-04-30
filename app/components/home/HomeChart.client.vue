@@ -27,14 +27,21 @@ type DataRecord = {
 }
 
 const { width } = useElementSize(cardRef)
-const { withYearQuery } = useAppYear()
+const { year, withYearQuery } = useAppYear()
+const submissionsEndpoint = '/api/submissions' as string
+const fetchSubmissions = $fetch as unknown as (
+  input: string,
+  init?: {
+    query?: Record<string, string>
+  }
+) => Promise<Submission[]>
 
 const { data: submissions } = await useAsyncData<Submission[]>(async () => {
-  return $fetch('/api/submissions', {
-    query: withYearQuery()
+  return fetchSubmissions(submissionsEndpoint, {
+    query: withYearQuery() as Record<string, string>
   })
 }, {
-  watch: [() => withYearQuery().year],
+  watch: [year],
   default: () => []
 })
 

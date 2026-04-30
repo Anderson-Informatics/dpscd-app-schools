@@ -43,6 +43,7 @@ const normalizeYear = (value: unknown): string => {
 }
 
 export function useAppYear() {
+  const route = useRoute()
   const yearCookie = useCookie<string | undefined>('app-year', {
     default: () => undefined,
     maxAge: 60 * 60 * 24 * 365, // 1 year
@@ -52,6 +53,14 @@ export function useAppYear() {
   })
 
   const year = useState<string>('app-year-state', () => {
+    const routeYear = route.query.year
+    if (typeof routeYear === 'string') {
+      return normalizeYear(routeYear)
+    }
+    if (Array.isArray(routeYear) && typeof routeYear[0] === 'string') {
+      return normalizeYear(routeYear[0])
+    }
+
     if (typeof yearCookie.value === 'string') {
       return normalizeYear(yearCookie.value)
     }
@@ -94,6 +103,25 @@ export function useAppYear() {
       year.value = normalizedCookieYear
     }
   })
+
+  // If year is provided in route query, treat it as source of truth for navigation.
+  watch(
+    () => route.query.year,
+    (nextRouteYear) => {
+      if (typeof nextRouteYear === 'string') {
+        const normalizedRouteYear = normalizeYear(nextRouteYear)
+        if (normalizedRouteYear !== year.value) {
+          year.value = normalizedRouteYear
+        }
+      } else if (Array.isArray(nextRouteYear) && typeof nextRouteYear[0] === 'string') {
+        const normalizedRouteYear = normalizeYear(nextRouteYear[0])
+        if (normalizedRouteYear !== year.value) {
+          year.value = normalizedRouteYear
+        }
+      }
+    },
+    { immediate: true }
+  )
 
   const selectedTeam = computed(
     () => APP_TEAMS.find((team) => team.year === year.value) ?? APP_TEAMS[0]!

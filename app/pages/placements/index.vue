@@ -29,19 +29,19 @@ const UDropdownMenu = resolveComponent('UDropdownMenu')
 
 const toast = useToast()
 const table = useTemplateRef('table')
-const { withYearQuery } = useAppYear()
+const { withYearQuery, year } = useAppYear()
 const userStore = useAppUser()
 const isSchoolAdmin = computed(() => userStore.value.user.role === 'school admin')
 
 // Get the results and schools data from the Pinia store
 const resultStore = useResultStore()
-await useAsyncData('results', () => resultStore.getAll(), {})
-await useAsyncData('pendingOffers', () => resultStore.getPending(), {})
-await useAsyncData('schools', () => resultStore.getSchools(), {})
+await useAsyncData('results', () => resultStore.getAll(), { watch: [year] })
+await useAsyncData('pendingOffers', () => resultStore.getPending(), { watch: [year] })
+await useAsyncData('schools', () => resultStore.getSchools(), { watch: [year] })
 const changeStore = useChangeStore()
-await useAsyncData('changes', () => changeStore.getAll(), {})
+await useAsyncData('changes', () => changeStore.getAll(), { watch: [year] })
 const settingsStore = useSettingsStore()
-await useAsyncData('settings', () => settingsStore.getSettings(), {})
+await useAsyncData('settings', () => settingsStore.getSettings(), { watch: [year] })
 
 const columnVisibility = ref({ _id: false })
 const rowSelection = ref({})
@@ -115,7 +115,7 @@ watch(
 )
 
 const { status } = await useFetch<User[]>('/api/customers', {
-  query: withYearQuery(),
+  query: computed(() => withYearQuery()),
   lazy: true
 })
 
@@ -605,7 +605,7 @@ const loadItem = (val: Result) => {
             <UForm :schema="schema" :state="state">
               Perform the "{{ formValues.actionLong }}" action for {{ formValues.FirstName }}
               {{ formValues.LastName }} at {{ formValues.School }} for the
-              {{ formValues.Grade }} grade.<br /><br />
+              {{ formValues.Grade }} grade.<br><br>
               <UFormField label="Notes" name="notes">
                 <UTextarea
                   v-model="formValues.notes"
@@ -639,9 +639,9 @@ const loadItem = (val: Result) => {
                 isSchoolAdmin && formValues.action !== 'Enroll'
                   ? undefined
                   : actions.runAction({
-                      ...formValues,
-                      stage: actions.buttonText.value
-                    })
+                    ...formValues,
+                    stage: actions.buttonText.value
+                  })
               "
             />
           </template>
@@ -810,9 +810,7 @@ const loadItem = (val: Result) => {
         }"
       />
 
-      <div
-        class="flex items-center justify-between gap-3 border-t border-(--ui-border) pt-4 mt-auto"
-      >
+      <div class="flex items-center justify-between gap-3 border-t border-(--ui-border) pt-4 mt-auto">
         <div class="text-sm text-(--ui-text-muted)">
           {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0 }}
           of

@@ -28,3 +28,6 @@ logs
 
 # Workflow files
 ci.yml
+
+# Local planning docs
+test_plan.md

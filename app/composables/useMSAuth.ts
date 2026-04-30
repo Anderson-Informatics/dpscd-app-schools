@@ -139,7 +139,7 @@ export const useMSAuth = () => {
 
   // Sign out user
   function signOut(accountId: string) {
-    const account = accountId ? msalInstance.value.getAccountByHomeId(accountId) : null
+    const account = accountId ? msalInstance.value.getAccount({ homeAccountId: accountId }) : null
     if (account) {
       msalInstance.value.logoutRedirect({
         account

@@ -89,7 +89,7 @@ export default defineEventHandler(async (event) => {
 
     const labelId = setLabelId(body, acceptIds, waitIds)
 
-    const response = await $fetch(
+    await $fetch(
       `https://submittable-api.submittable.com/v4/submissions/${body.submissionId}/labels/${labelId}`,
       {
         method: 'PUT',
@@ -133,7 +133,7 @@ export default defineEventHandler(async (event) => {
       const stageId = setStageId(body, stagePK, stageK1, stage28)
 
       if (stageId !== '') {
-        const responseStage = await $fetch(
+        await $fetch(
           `https://submittable-api.submittable.com/v4/submissions/${body.submissionId}/stage/${stageId}`,
           {
             method: 'PUT',
@@ -147,9 +147,9 @@ export default defineEventHandler(async (event) => {
     }
 
     return { message: 'New accept label properly applied' }
-  } catch (e: any) {
+  } catch (e: unknown) {
     throw createError({
-      message: e.message
+      message: e instanceof Error ? e.message : 'Unable to apply submittable label'
     })
   }
 })

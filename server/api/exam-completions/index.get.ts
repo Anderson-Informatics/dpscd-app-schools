@@ -1,13 +1,6 @@
-import type { FilterQuery } from 'mongoose'
 import { getQuery } from 'h3'
 import ExamCompletionModel from '~~/server/models/exam-completion.model'
 import { getYearFromEvent } from '~~/server/utils/year'
-
-type ExamCompletionDoc = {
-  year?: string | number
-  Round?: string
-  GradeEntering?: string
-}
 
 export default defineEventHandler(async (event) => {
   const year = getYearFromEvent(event)
@@ -16,7 +9,7 @@ export default defineEventHandler(async (event) => {
   const yearCandidates: Array<string | number> = Number.isFinite(parsedYear)
     ? [year, parsedYear]
     : [year]
-  const filter: FilterQuery<ExamCompletionDoc> = {
+  const filter: Record<string, unknown> = {
     year: {
       $in: yearCandidates
     }

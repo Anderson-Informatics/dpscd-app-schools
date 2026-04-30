@@ -572,9 +572,9 @@ const loadItem = (val: Result) => {
                 isSchoolAdmin && formValues.action !== 'Enroll'
                   ? undefined
                   : actions.runAction({
-                      ...formValues,
-                      stage: actions.buttonText.value
-                    })
+                    ...formValues,
+                    stage: actions.buttonText.value
+                  })
               "
             />
           </template>
@@ -735,8 +735,8 @@ const loadItem = (val: Result) => {
 
             <div v-if="row.original.contact">
               {{ row.original.contact.ParentFirst }}
-              {{ row.original.contact.ParentLast }}<br />
-              {{ row.original.contact.ParentPhone }}<br />
+              {{ row.original.contact.ParentLast }}<br>
+              {{ row.original.contact.ParentPhone }}<br>
               {{ row.original.contact.ParentEmail }}
             </div>
             <div v-else>Reload the page to fetch the contact details.</div>
@@ -749,9 +749,9 @@ const loadItem = (val: Result) => {
 
             <div v-if="row.original.results">
               <div v-for="(result, index) in row.original.results" :key="index" class="mb-4">
-                <strong v-if="result.School">{{ result.School }}</strong
-                ><br />
-                Choice: &nbsp;{{ result.ChoiceRank }}<br />
+                <strong v-if="result.School">{{ result.School }}</strong>
+                <br>
+                Choice: &nbsp;{{ result.ChoiceRank }}<br>
                 {{ result.lotteryList }}
                 <span v-if="result.adjustedRank"> Position {{ result.adjustedRank }}</span>
               </div>
@@ -761,9 +761,7 @@ const loadItem = (val: Result) => {
         </template>
       </UTable>
 
-      <div
-        class="flex items-center justify-between gap-3 border-t border-(--ui-border) pt-4 mt-auto"
-      >
+      <div class="flex items-center justify-between gap-3 border-t border-(--ui-border) pt-4 mt-auto">
         <div class="text-sm text-(--ui-text-muted)">
           {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0 }}
           of

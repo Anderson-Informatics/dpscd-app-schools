@@ -69,12 +69,12 @@ const links = [
 }, {
   label: 'Customers',
   icon: 'i-lucide-users',
-  to: '/customers',
+   to: 'https://github.com/nuxt/ui',
   onSelect: () => {
     open.value = false
   }
 }, {
-  label: 'Settings',
+   to: 'https://ui.nuxt.com',
   to: '/settings',
   icon: 'i-lucide-settings',
   defaultOpen: true,
@@ -108,12 +108,12 @@ const links = [
   ] /* [{
   label: 'Feedback',
   icon: 'i-lucide-message-circle',
-  to: 'https://github.com/nuxt-ui-pro/dashboard',
+  to: 'https://github.com/nuxt/ui',
   target: '_blank'
 }, {
   label: 'Help & Support',
   icon: 'i-lucide-info',
-  to: 'https://github.com/nuxt/ui-pro',
+  to: 'https://ui.nuxt.com',
   target: '_blank'
 }] */
 ]
@@ -130,7 +130,7 @@ const groups = computed(() => [
     id: 'source',
     label: 'View page source',
     icon: 'i-simple-icons-github',
-    to: `https://github.com/nuxt-ui-pro/dashboard/blob/main/app/pages${route.path === '/' ? '/index' : route.path}.vue`,
+     to: `https://github.com/nuxt/ui`,
     target: '_blank'
   }]
 } */
