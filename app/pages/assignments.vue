@@ -23,8 +23,38 @@ const { data, status, error, refresh } = await useFetch<Assignment[]>('/api/assi
 
 const selectedStage = ref<string | null>(null)
 const selectedCompletion = ref<CompletionFilter>(null)
+const selectedRound = ref<string>('all')
 
-const assignments = computed(() => data.value ?? [])
+const allAssignments = computed(() => data.value ?? [])
+
+const normalizeRound = (value?: string | null) => {
+  if (!value || !value.trim()) {
+    return 'Unspecified'
+  }
+
+  return value.trim()
+}
+
+const roundOptions = computed(() => {
+  const rounds = [...new Set(
+    allAssignments.value.map((a) => normalizeRound(a.Round))
+  )].sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
+
+  return [
+    { label: 'All Rounds', value: 'all' },
+    ...rounds.map((r) => ({ label: r, value: r }))
+  ]
+})
+
+const assignments = computed(() => {
+  if (selectedRound.value === 'all') {
+    return allAssignments.value
+  }
+
+  return allAssignments.value.filter(
+    (a) => normalizeRound(a.Round) === selectedRound.value
+  )
+})
 
 const getStageName = (value?: string | null) => {
   if (!value || !value.trim()) {
@@ -272,6 +302,22 @@ const detailColumns: TableColumn<Assignment>[] = [
       </template>
 
       <template v-else>
+        <div class="mb-4 flex flex-wrap items-center gap-3">
+          <span class="text-sm font-medium text-(--ui-text-highlighted)">
+            Filters
+          </span>
+
+          <USelect
+            v-model="selectedRound"
+            :items="roundOptions"
+            placeholder="Filter round"
+            class="min-w-36"
+            :ui="{
+              trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200'
+            }"
+          />
+        </div>
+
         <UPageCard
           title="Assignments Summary"
           description="Each stage shows total assignments and completion split. Click complete or incomplete totals to open details below."
