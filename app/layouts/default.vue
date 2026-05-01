@@ -58,6 +58,14 @@ const links = [
       onSelect: () => {
         open.value = false
       }
+    },
+    {
+      label: 'Assignments',
+      icon: 'i-lucide-list-checks',
+      to: '/assignments',
+      onSelect: () => {
+        open.value = false
+      }
     } /* {
   label: 'Inbox',
   icon: 'i-lucide-inbox',
