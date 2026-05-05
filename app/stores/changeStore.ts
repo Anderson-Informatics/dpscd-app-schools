@@ -22,6 +22,7 @@ export const useChangeStore = defineStore('change-store', {
         return data
       } catch (e: unknown) {
         console.log(getErrorMessage(e))
+        throw e
       }
     },
     async addChange(body: Change) {
@@ -40,6 +41,7 @@ export const useChangeStore = defineStore('change-store', {
         return [response, resp2]
       } catch (e: unknown) {
         console.log(getErrorMessage(e))
+        throw e
       }
     }
   }

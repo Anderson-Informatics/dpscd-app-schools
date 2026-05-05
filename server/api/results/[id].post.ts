@@ -56,7 +56,9 @@ export default defineEventHandler(async (event) => {
 
   // Update a result
   try {
-    await ResultModel.updateOne(withYearFilter(year, { _id: id }), updateFields)
+    await ResultModel.updateOne(withYearFilter(year, { _id: id }), {
+      $set: updateFields
+    })
     return { message: 'Lottery placement result updated' }
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : String(e)

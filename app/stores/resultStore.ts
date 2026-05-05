@@ -39,6 +39,7 @@ export const useResultStore = defineStore('result-store', {
         return data
       } catch (e: unknown) {
         console.log(getErrorMessage(e))
+        throw e
       }
     },
     async getPending() {
@@ -50,6 +51,7 @@ export const useResultStore = defineStore('result-store', {
         return data
       } catch (e: unknown) {
         console.log(getErrorMessage(e))
+        throw e
       }
     },
     async getSchools() {
@@ -61,6 +63,7 @@ export const useResultStore = defineStore('result-store', {
         this.schools = data
       } catch (e: unknown) {
         console.log(getErrorMessage(e))
+        throw e
       }
     },
     async getCapacity() {
@@ -72,6 +75,7 @@ export const useResultStore = defineStore('result-store', {
         this.capacity = data
       } catch (e: unknown) {
         console.log(getErrorMessage(e))
+        throw e
       }
     },
     async updateCapacity(school: SchoolGrade) {
@@ -82,8 +86,10 @@ export const useResultStore = defineStore('result-store', {
           body: withYearBody({ ...school })
         })
         console.log(response)
+        return response
       } catch (e: unknown) {
         console.log(getErrorMessage(e))
+        throw e
       }
       console.log(school)
     },
@@ -99,8 +105,10 @@ export const useResultStore = defineStore('result-store', {
           })
         })
         console.log(response)
+        return response
       } catch (e: unknown) {
         console.log(getErrorMessage(e))
+        throw e
       }
       console.log(result)
     },
@@ -112,8 +120,10 @@ export const useResultStore = defineStore('result-store', {
           body: withYearBody({ ...result })
         })
         console.log(response)
+        return response
       } catch (e: unknown) {
         console.log(getErrorMessage(e))
+        throw e
       }
     },
     async adjustRankings(ids: string[]) {
@@ -126,8 +136,10 @@ export const useResultStore = defineStore('result-store', {
           })
         })
         console.log(response)
+        return response
       } catch (e: unknown) {
         console.log(getErrorMessage(e))
+        throw e
       }
       console.log(ids)
     },
@@ -139,8 +151,10 @@ export const useResultStore = defineStore('result-store', {
           body: withYearBody({ ...result, type: type })
         })
         console.log(response)
+        return response
       } catch (e: unknown) {
         console.log(getErrorMessage(e))
+        throw e
       }
     },
     async deleteLabel(result: Result, type: string) {
@@ -151,8 +165,10 @@ export const useResultStore = defineStore('result-store', {
           body: withYearBody({ ...result, type: type })
         })
         console.log(response)
+        return response
       } catch (e: unknown) {
         console.log(getErrorMessage(e))
+        throw e
       }
     }
   }
